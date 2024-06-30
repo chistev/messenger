@@ -20,7 +20,7 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-client/.prettierignore
+.prettierignore
 client/.prettierrc
 client/eslint.config.js
 client/package-lock.json
