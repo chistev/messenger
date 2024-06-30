@@ -21,9 +21,9 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 .prettierignore
-client/.prettierrc
-client/eslint.config.js
-client/package-lock.json
-client/playwright.config.js
-client/svelte.config.js
-client/vite.config.js
+.prettierrc
+eslint.config.js
+package-lock.json
+playwright.config.js
+svelte.config.js
+vite.config.js
