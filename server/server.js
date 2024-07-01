@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const clientport = 5173
+const User = require('./models/User');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -41,18 +43,23 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
+app.get('/', (req, res) => {
+  res.redirect(`http://localhost:${clientport}/`);
+});
+
 const authRoutes = require('./controllers/authControllers/authRoutes');
 const usernameRoutes = require('./controllers/authControllers/usernameRoutes');
 
 app.use('/', authRoutes);
 app.use('/', usernameRoutes);
 
+
 // Serve static files from the 'client/public' folder (where Svelte outputs files)
 app.use(express.static(path.join(__dirname, '../client/static')));
 
 // Serve the Svelte application
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/src', 'app.html'));
+  res.sendFile(path.join(__dirname, '../client/src'));
 });
 
 app.listen(port, () => {
