@@ -1,14 +1,28 @@
 <script>
     import Settings from '../../components/Settings.svelte';
+    import { onMount } from 'svelte';
 
     let showSettings = false;
+    let settingsComponent;
 
     function toggleSettings() {
         showSettings = !showSettings;
         console.log('Toggle Settings Clicked. showSettings:', showSettings);
+
+        if (showSettings) {
+            settingsComponent = new Settings({
+                target: document.body
+            });
+
+            settingsComponent.$on('closeSettings', () => {
+                showSettings = false;
+                settingsComponent = null; // Remove the component instance
+            });
+        } else {
+            settingsComponent = null; // Remove the component instance
+        }
     }
 </script>
-
 <style>
     /* Logout */
     .sign-in-btn {
@@ -144,8 +158,8 @@
                     </div>
                 </div>
             </div>
-            {#if showSettings}
-                <Settings />
+            {#if showSettings && settingsComponent}
+                <Settings on:closeSettings={() => showSettings = false} />
             {:else}
                 <div id="content-column" class="col-md-8 border-right d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3 text-center">
@@ -163,5 +177,4 @@
             {/if}
         </div>
     </div>
-    
-  </body>
+</body>
