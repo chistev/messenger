@@ -7,6 +7,7 @@ export default defineConfig({
         proxy: {
             '/check-username': 'http://localhost:3000',
             '/select-username': 'http://localhost:3000',
+            '/api': 'http://localhost:3000',
         }
     }
 });

@@ -62,6 +62,36 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/src'));
 });
 
+app.get('/api/users', async (req, res) => {
+  const { username } = req.query;
+  const currentUserUsername = req.user.username; 
+
+   try {
+    // Fetch the current user to get the selectedUsers array
+    const currentUser = await User.findOne({ username: currentUserUsername });
+
+    if (!currentUser) {
+      return res.status(404).send('Current user not found');
+    }
+
+    const selectedUserIds = currentUser.selectedUsers.map(user => user._id);
+    console.log('Selected users to exclude:', selectedUserIds);
+
+    // Find users matching the query but exclude the current user and selected users
+    const users = await User.find({ 
+      username: new RegExp(username, 'i'), 
+      username: { $ne: currentUserUsername }, // Exclude the current user's username
+      _id: { $nin: selectedUserIds } // Exclude already selected users
+    }).limit(10);
+
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
+});
+
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
