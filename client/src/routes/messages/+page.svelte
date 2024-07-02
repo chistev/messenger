@@ -1,10 +1,12 @@
 <script>
     import Settings from '../../components/Settings.svelte';
-    import { onMount } from 'svelte';
+    import MessageModal from '../../components/MessageModal.svelte';
 
     let showSettings = false;
     let settingsComponent;
+    let showMessageModal = false;
 
+    // Function to toggle settings component
     function toggleSettings() {
         showSettings = !showSettings;
         console.log('Toggle Settings Clicked. showSettings:', showSettings);
@@ -22,6 +24,12 @@
             settingsComponent = null; // Remove the component instance
         }
     }
+
+    // Function to toggle message modal
+    function toggleMessageModal() {
+        showMessageModal = !showMessageModal;
+    }
+    
 </script>
 <style>
     /* Logout */
@@ -141,7 +149,7 @@
                         </h3>
                         <div class="fs-6 text-white">
                             <i style="cursor: pointer;" class="bi bi-gear me-3" on:click={toggleSettings} aria-label="Toggle Settings"></i>
-                            <i class="bi bi-envelope-at"></i>
+                            <i class="bi bi-envelope-at" style="cursor: pointer;" on:click={toggleMessageModal} aria-label="Open Message Modal"></i>
                         </div>
                     </div>
                     <br id="break-tag">
@@ -177,4 +185,6 @@
             {/if}
         </div>
     </div>
+<MessageModal showModal={showMessageModal} on:closeModal={() => showMessageModal = false} />
+
 </body>
