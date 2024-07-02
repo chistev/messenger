@@ -25,10 +25,19 @@
         }
     }
 
-    // Function to toggle message modal
     function toggleMessageModal() {
-        showMessageModal = !showMessageModal;
-    }
+      showMessageModal = !showMessageModal;
+      if (showMessageModal) {
+          document.querySelector('.page-container').style.backgroundColor = '#242d34'; 
+      } else {
+          document.querySelector('.page-container').style.backgroundColor = '#000000'; // Revert to original color
+      }
+  }
+
+  function closeMessageModal() {
+      showMessageModal = false;
+      document.querySelector('.page-container').style.backgroundColor = '#000000'; // Revert to original color
+  }
     
 </script>
 <style>
@@ -138,7 +147,7 @@
     }
   </style>
   
-  <body class="text-white" style="background-color: #000000;">
+  <div class="page-container" style="background-color: #000000;">
     <div class="container-fluid min-vh-100 d-flex flex-column" style="width: 80%;">
         <div class="row flex-grow-1">
             <div class="col-md-4 border-right" id="sidebar-container">
@@ -185,6 +194,5 @@
             {/if}
         </div>
     </div>
-<MessageModal showModal={showMessageModal} on:closeModal={() => showMessageModal = false} />
-
-</body>
+    <MessageModal showModal={showMessageModal} on:closeModal={closeMessageModal} />
+</div>
