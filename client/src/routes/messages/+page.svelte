@@ -4,12 +4,14 @@
 	import SideBarWelcomeMessage from '../../components/SideBarWelcomeMessage.svelte';
     import { onMount } from 'svelte';
 	import SelectedUsersList from '../../components/SelectedUsersList.svelte';
+	import Spinner from '../../components/Spinner.svelte';
     
 
     let showSettings = false;
     let settingsComponent;
     let showMessageModal = false;
     let selectedUsers = [];
+    let loading = true; // Add a loading state
 
     // Function to toggle settings component
     function toggleSettings() {
@@ -53,6 +55,8 @@
       selectedUsers = data.selectedUsers;
     } catch (err) {
       console.error('Failed to fetch selected users:', err);
+    } finally {
+      loading = false; // Set loading to false when the request is complete
     }
   });
     
@@ -178,11 +182,15 @@
                             <i class="bi bi-envelope-at" style="cursor: pointer;" on:click={toggleMessageModal} aria-label="Open Message Modal"></i>
                         </div>
                     </div>
-                    {#if selectedUsers.length === 0}
-                    <SideBarWelcomeMessage on:writeMessage={toggleMessageModal} />
-                    {:else}
-                    <SelectedUsersList {selectedUsers} />
-                    {/if} 
+                    {#if loading}
+                        <Spinner size="3rem" /> <!-- Show spinner while loading -->
+                    {:else} 
+                        {#if selectedUsers.length === 0}
+                        <SideBarWelcomeMessage on:writeMessage={toggleMessageModal} />
+                        {:else}
+                        <SelectedUsersList {selectedUsers} />
+                        {/if} 
+                    {/if}
                 </div>
             </div>
             {#if showSettings && settingsComponent}
