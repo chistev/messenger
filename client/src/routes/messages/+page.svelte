@@ -2,9 +2,10 @@
     import Settings from '../../components/Settings.svelte';
     import MessageModal from '../../components/MessageModal.svelte';
 	import SideBarWelcomeMessage from '../../components/SideBarWelcomeMessage.svelte';
-    import { onMount } from 'svelte';
 	import SelectedUsersList from '../../components/SelectedUsersList.svelte';
 	import Spinner from '../../components/Spinner.svelte';
+    import ChatPanel from '../../components/ChatPanel.svelte';
+    import { onMount } from 'svelte';
     
 
     let showSettings = false;
@@ -12,6 +13,7 @@
     let showMessageModal = false;
     let selectedUsers = [];
     let loading = true; // Add a loading state
+    let currentChatUser = null; // Track the selected user for chat
 
     // Function to toggle settings component
     function toggleSettings() {
@@ -46,6 +48,10 @@
       document.querySelector('.page-container').style.backgroundColor = '#000000'; // Revert to original color
   }
 
+  function handleUserSelection(event) {
+        currentChatUser = event.detail; // Set the selected user for chat
+    }
+
   onMount(async () => {
     try {
       const response = await fetch('/api/selected-users', {
@@ -61,110 +67,10 @@
   });
     
 </script>
-<style>
-    /* Logout */
-    .sign-in-btn {
-        transition: background-color 0.3s, color 0.3s;
-    }
-  
-    .sign-in-btn:hover {
-        background-color: rgba(29, 155, 240, 0.1);
-    }
-  
-    /* Select Username */
-    .submit-button {
-        background-color: transparent;
-        color: white;
-        padding: 10px 20px;
-        border: 1px solid #ccc;
-        border-radius: 50px;
-        cursor: pointer;
-        width: 80%;
-        transition: background-color 0.3s ease;
-    }
-  
-    .submit-button:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-  
-    .input-error {
-        border-color: #f4212e !important;
-    }
-  
-    /* Messages */
+<style>  
     .border-right {
         border-right: 1px solid #2f3336;
         border-left: 1px solid #2f3336;
-    }
-  
-    .form-control::placeholder {
-        color: #e7e9ea;
-        opacity: 1;
-        font-weight: bold;
-    }
-  
-    .direct-search-input-container {
-        display: flex;
-        align-items: center;
-        border: 1px solid #35363a;
-        border-radius: 25px;
-        padding: 5px 15px;
-        width: 100%;
-    }
-  
-    .direct-search-input {
-        background: transparent;
-        border: none;
-        color: #e7e9ea;
-        flex-grow: 1;
-        outline: none;
-    }
-  
-    .direct-search-input:focus {
-        background: transparent;
-        box-shadow: none;
-        color: #e7e9ea;;
-    }
-  
-    .direct-search-input::placeholder {
-        color: #71767b;
-        font-weight: 100;
-    }
-  
-    .three-dots-icon-container {
-        cursor: pointer;
-    }
-  
-    .user-container .three-dots-icon-container {
-        display: none;
-    }
-  
-    .user-container:hover .three-dots-icon-container {
-        display: block;
-    }
-  
-    .three-dots-custom-modal-dialog {
-        max-width: fit-content;
-        margin: auto;
-    }
-  
-    .custom-popover {
-        background-color: #202327;
-        color: #e7e9ea;
-        border-radius: 0.5rem;
-    }
-  
-    .custom-popover .popover-arrow::before {
-        background-color: #202327;
-    }
-  
-    .custom-popover .custom-popover-content {
-        color: #e7e9ea;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-        font-weight: 700; 
-        font-size: 15px; 
-        line-height: 20px; 
-        color: #e7e9ea;
     }
   </style>
   
@@ -188,13 +94,15 @@
                         {#if selectedUsers.length === 0}
                         <SideBarWelcomeMessage on:writeMessage={toggleMessageModal} />
                         {:else}
-                        <SelectedUsersList {selectedUsers} />
+                        <SelectedUsersList {selectedUsers} on:selectUser={handleUserSelection} />
                         {/if} 
                     {/if}
                 </div>
             </div>
             {#if showSettings && settingsComponent}
                 <Settings on:closeSettings={() => showSettings = false} />
+            {:else if currentChatUser}
+                    <ChatPanel {currentChatUser} />
             {:else}
                 <div id="content-column" class="col-md-8 border-right d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3 text-center">
