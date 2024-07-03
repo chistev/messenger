@@ -2,10 +2,14 @@
     import Settings from '../../components/Settings.svelte';
     import MessageModal from '../../components/MessageModal.svelte';
 	import SideBarWelcomeMessage from '../../components/SideBarWelcomeMessage.svelte';
+    import { onMount } from 'svelte';
+	import SelectedUsersList from '../../components/SelectedUsersList.svelte';
+    
 
     let showSettings = false;
     let settingsComponent;
     let showMessageModal = false;
+    let selectedUsers = [];
 
     // Function to toggle settings component
     function toggleSettings() {
@@ -40,7 +44,17 @@
       document.querySelector('.page-container').style.backgroundColor = '#000000'; // Revert to original color
   }
 
-  
+  onMount(async () => {
+    try {
+      const response = await fetch('/api/selected-users', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      selectedUsers = data.selectedUsers;
+    } catch (err) {
+      console.error('Failed to fetch selected users:', err);
+    }
+  });
     
 </script>
 <style>
@@ -164,7 +178,11 @@
                             <i class="bi bi-envelope-at" style="cursor: pointer;" on:click={toggleMessageModal} aria-label="Open Message Modal"></i>
                         </div>
                     </div>
+                    {#if selectedUsers.length === 0}
                     <SideBarWelcomeMessage on:writeMessage={toggleMessageModal} />
+                    {:else}
+                    <SelectedUsersList {selectedUsers} />
+                    {/if} 
                 </div>
             </div>
             {#if showSettings && settingsComponent}

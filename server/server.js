@@ -125,6 +125,18 @@ app.post('/api/select-user', async (req, res) => {
   }
 });
 
+app.get('/api/selected-users', async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate('selectedUsers');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ selectedUsers: user.selectedUsers });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
