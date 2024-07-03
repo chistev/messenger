@@ -1,15 +1,13 @@
 <script>
     import Settings from '../../components/Settings.svelte';
     import MessageModal from '../../components/MessageModal.svelte';
-	import SideBarWelcomeMessage from '../../components/SideBarWelcomeMessage.svelte';
-	import SelectedUsersList from '../../components/SelectedUsersList.svelte';
-	import Spinner from '../../components/Spinner.svelte';
+    import SideBarWelcomeMessage from '../../components/SideBarWelcomeMessage.svelte';
+    import SelectedUsersList from '../../components/SelectedUsersList.svelte';
+    import Spinner from '../../components/Spinner.svelte';
     import ChatPanel from '../../components/ChatPanel.svelte';
     import { onMount } from 'svelte';
-    
 
     let showSettings = false;
-    let settingsComponent;
     let showMessageModal = false;
     let selectedUsers = [];
     let loading = true; // Add a loading state
@@ -19,62 +17,49 @@
     function toggleSettings() {
         showSettings = !showSettings;
         console.log('Toggle Settings Clicked. showSettings:', showSettings);
-
-        if (showSettings) {
-            settingsComponent = new Settings({
-                target: document.body
-            });
-
-            settingsComponent.$on('closeSettings', () => {
-                showSettings = false;
-                settingsComponent = null; // Remove the component instance
-            });
-        } else {
-            settingsComponent = null; // Remove the component instance
-        }
     }
 
     function toggleMessageModal() {
-      showMessageModal = !showMessageModal;
-      if (showMessageModal) {
-          document.querySelector('.page-container').style.backgroundColor = '#242d34'; 
-      } else {
-          document.querySelector('.page-container').style.backgroundColor = '#000000'; // Revert to original color
-      }
-  }
+        showMessageModal = !showMessageModal;
+        if (showMessageModal) {
+            document.querySelector('.page-container').style.backgroundColor = '#242d34'; 
+        } else {
+            document.querySelector('.page-container').style.backgroundColor = '#000000'; // Revert to original color
+        }
+    }
 
-  function closeMessageModal() {
-      showMessageModal = false;
-      document.querySelector('.page-container').style.backgroundColor = '#000000'; // Revert to original color
-  }
+    function closeMessageModal() {
+        showMessageModal = false;
+        document.querySelector('.page-container').style.backgroundColor = '#000000'; // Revert to original color
+    }
 
-  function handleUserSelection(event) {
+    function handleUserSelection(event) {
         currentChatUser = event.detail; // Set the selected user for chat
     }
 
-  onMount(async () => {
-    try {
-      const response = await fetch('/api/selected-users', {
-        credentials: 'include'
-      });
-      const data = await response.json();
-      selectedUsers = data.selectedUsers;
-    } catch (err) {
-      console.error('Failed to fetch selected users:', err);
-    } finally {
-      loading = false; // Set loading to false when the request is complete
-    }
-  });
-    
+    onMount(async () => {
+        try {
+            const response = await fetch('/api/selected-users', {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            selectedUsers = data.selectedUsers;
+        } catch (err) {
+            console.error('Failed to fetch selected users:', err);
+        } finally {
+            loading = false; // Set loading to false when the request is complete
+        }
+    });
 </script>
-<style>  
+
+<style>
     .border-right {
         border-right: 1px solid #2f3336;
         border-left: 1px solid #2f3336;
     }
-  </style>
-  
-  <div class="page-container" style="background-color: #000000;">
+</style>
+
+<div class="page-container" style="background-color: #000000;">
     <div class="container-fluid min-vh-100 d-flex flex-column" style="width: 80%;">
         <div class="row flex-grow-1">
             <div class="col-md-4 border-right" id="sidebar-container">
@@ -92,17 +77,17 @@
                         <Spinner size="3rem" /> <!-- Show spinner while loading -->
                     {:else} 
                         {#if selectedUsers.length === 0}
-                        <SideBarWelcomeMessage on:writeMessage={toggleMessageModal} />
+                            <SideBarWelcomeMessage on:writeMessage={toggleMessageModal} />
                         {:else}
-                        <SelectedUsersList {selectedUsers} on:selectUser={handleUserSelection} />
-                        {/if} 
+                            <SelectedUsersList {selectedUsers} on:selectUser={handleUserSelection} />
+                        {/if}
                     {/if}
                 </div>
             </div>
-            {#if showSettings && settingsComponent}
+            {#if showSettings}
                 <Settings on:closeSettings={() => showSettings = false} />
             {:else if currentChatUser}
-                    <ChatPanel {currentChatUser} />
+                <ChatPanel {currentChatUser} />
             {:else}
                 <div id="content-column" class="col-md-8 border-right d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3 text-center">
