@@ -1,19 +1,34 @@
-<!-- SelectedUsersList.svelte -->
 <script>
   import { createEventDispatcher } from 'svelte';
+
+  // Define props and variables
   export let selectedUsers = [];
   const dispatch = createEventDispatcher();
   
+  // State variable for currently selected user
   let currentSelectedUser = null;
 
+  // Function to handle user selection
   function selectUser(user) {
     // Emit an event to notify the parent component
     dispatch('selectUser', user);
+    
     // Update the URL
     history.pushState(null, '', `/messages/${user._id}`);
-    // Update the currentSelectedUser
+    
+    // Update the currentSelectedUser state variable
     currentSelectedUser = user;
   }
+
+  // On mount, check if there's a user ID in the URL and highlight the corresponding user
+  import { onMount } from 'svelte';
+  onMount(() => {
+    const userId = window.location.pathname.split('/').pop();
+    const userToHighlight = selectedUsers.find(user => user._id === userId);
+    if (userToHighlight) {
+      currentSelectedUser = userToHighlight;
+    }
+  });
 </script>
 
 <style>
@@ -67,6 +82,7 @@
   {#each selectedUsers as user}
     <div class="user-container d-flex align-items-center justify-content-between mb-3 p-2"
          class:selected={user === currentSelectedUser}
+         style="background-color: {currentSelectedUser && currentSelectedUser._id === user._id ? '#202327' : 'transparent'};"
          on:click={() => selectUser(user)}>
       <div class="d-flex align-items-center">
         <div class="me-3">
