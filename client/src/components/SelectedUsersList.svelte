@@ -2,10 +2,12 @@
   import { createEventDispatcher } from 'svelte';
   export let selectedUsers = [];
   const dispatch = createEventDispatcher();
-  
+
   function selectUser(user) {
     // Emit an event to notify the parent component
     dispatch('selectUser', user);
+    // Update the URL
+    history.pushState(null, '', `/messages/${user._id}`);
   }
 </script>
 

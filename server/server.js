@@ -137,6 +137,20 @@ app.get('/api/selected-users', async (req, res) => {
   }
 });
 
+app.get('/api/users/:userid', async (req, res) => {
+  console.log("route hit")
+  try {
+      const user = await User.findById(req.params.userid);
+      if (!user) {
+          return res.status(404).send({ message: 'User not found' });
+      }
+      res.send(user);
+  } catch (error) {
+      res.status(500).send({ message: 'Server error' });
+  }
+});
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

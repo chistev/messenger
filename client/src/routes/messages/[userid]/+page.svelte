@@ -1,53 +1,65 @@
 <script>
-    import Settings from '../../components/Settings.svelte';
-    import MessageModal from '../../components/MessageModal.svelte';
-    import SideBarWelcomeMessage from '../../components/SideBarWelcomeMessage.svelte';
-    import SelectedUsersList from '../../components/SelectedUsersList.svelte';
-    import Spinner from '../../components/Spinner.svelte';
-    import ChatPanel from '../../components/ChatPanel.svelte';
-    import SelectMessage from '../../components/SelectMessage.svelte';
     import { onMount } from 'svelte';
-  
+    import { onDestroy } from 'svelte';
+    import Spinner from '../../../components/Spinner.svelte';
+    import ChatPanel from '../../../components/ChatPanel.svelte';
+    import MessageModal from '../../../components/MessageModal.svelte';
+    import SelectedUsersList from '../../../components/SelectedUsersList.svelte';
+    import Settings from '../../../components/Settings.svelte';
+
     let showSettings = false;
     let showMessageModal = false;
     let selectedUsers = [];
     let loading = true;
     let currentChatUser = null;
-  
+
     function toggleSettings() {
         showSettings = !showSettings;
     }
-  
+
     function toggleMessageModal() {
         showMessageModal = !showMessageModal;
-        if (showMessageModal) {
-            document.querySelector('.page-container').style.backgroundColor = '#242d34'; 
-        } else {
-            document.querySelector('.page-container').style.backgroundColor = '#000000';
-        }
+        document.querySelector('.page-container').style.backgroundColor = showMessageModal ? '#242d34' : '#000000';
     }
-  
+
     function closeMessageModal() {
         showMessageModal = false;
         document.querySelector('.page-container').style.backgroundColor = '#000000';
     }
-  
+
     function handleUserSelection(event) {
         currentChatUser = event.detail;
+        history.pushState(null, '', `/messages/${currentChatUser._id}`);
     }
-  
+
+    async function fetchUserById(userId) {
+        console.log("fetchUserById called with userId", userId); // Debugging statement
+        const response = await fetch(`/api/users/${userId}`, {
+            credentials: 'include'
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch user');
+        }
+        const user = await response.json();
+        console.log("User fetched", user); // Debugging statement
+        return user;
+    }
+
     onMount(async () => {
+        const userId = window.location.pathname.split('/').pop(); // Extract userId from URL path
+        console.log("Current userId:", userId); // Debugging statement
         try {
             const response = await fetch('/api/selected-users', {
                 credentials: 'include'
             });
             const data = await response.json();
             selectedUsers = data.selectedUsers;
-  
-            // Check URL to load appropriate user on mount
-            const userId = window.location.pathname.split('/').pop();
-            if (userId && selectedUsers.some(user => user._id === userId)) {
-                currentChatUser = selectedUsers.find(user => user._id === userId);
+            console.log("Selected users fetched", selectedUsers); // Debugging statement
+
+            // Check if userId is valid and load appropriate user
+            if (userId) {
+                currentChatUser = await fetchUserById(userId);
+                console.log("currentChatUser set", currentChatUser); // Debugging statement
             }
         } catch (err) {
             console.error('Failed to fetch selected users:', err);
@@ -55,16 +67,20 @@
             loading = false;
         }
     });
-  </script>
-  
-  <style>
+
+    onDestroy(() => {
+        // Cleanup if needed
+    });
+</script>
+
+<style>
     .border-right {
         border-right: 1px solid #2f3336;
         border-left: 1px solid #2f3336;
     }
-  </style>
-  
-  <div class="page-container" style="background-color: #000000;">
+</style>
+
+<div class="page-container" style="background-color: #000000;">
     <div class="container-fluid min-vh-100 d-flex flex-column" style="width: 80%;">
         <div class="row flex-grow-1">
             <div class="col-md-4 border-right" id="sidebar-container">
@@ -81,11 +97,7 @@
                     {#if loading}
                         <Spinner size="3rem" />
                     {:else}
-                        {#if selectedUsers.length === 0}
-                            <SideBarWelcomeMessage on:writeMessage={toggleMessageModal} />
-                        {:else}
-                            <SelectedUsersList {selectedUsers} on:selectUser={handleUserSelection} />
-                        {/if}
+                        <SelectedUsersList {selectedUsers} on:selectUser={handleUserSelection} />
                     {/if}
                 </div>
             </div>
@@ -93,11 +105,8 @@
                 <Settings on:closeSettings={() => showSettings = false} />
             {:else if currentChatUser}
                 <ChatPanel {currentChatUser} />
-            {:else}
-                <SelectMessage {toggleMessageModal} />
             {/if}
         </div>
     </div>
     <MessageModal showModal={showMessageModal} on:closeModal={closeMessageModal} />
-  </div>
-  
+</div>
