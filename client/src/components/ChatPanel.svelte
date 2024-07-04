@@ -43,6 +43,10 @@
     margin-top: 2px;
   }
 
+  .message.sent .timestamp {
+    color: #cce7ff; /* Change this color to something that contrasts well with the sent message background */
+  }
+
   .date-separator {
     text-align: center;
     color: #71767b;
@@ -75,7 +79,6 @@
     padding-bottom: 60px; /* Height of the footer */
   }
 
-  
   .chat-footer .input-container {
     display: flex;
     align-items: center;
