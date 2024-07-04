@@ -1,13 +1,18 @@
+<!-- SelectedUsersList.svelte -->
 <script>
   import { createEventDispatcher } from 'svelte';
   export let selectedUsers = [];
   const dispatch = createEventDispatcher();
+  
+  let currentSelectedUser = null;
 
   function selectUser(user) {
     // Emit an event to notify the parent component
     dispatch('selectUser', user);
     // Update the URL
     history.pushState(null, '', `/messages/${user._id}`);
+    // Update the currentSelectedUser
+    currentSelectedUser = user;
   }
 </script>
 
@@ -45,6 +50,11 @@
     color: #71767b;
     font-weight: 100;
   }
+
+  /* Apply background color to selected user */
+  .user-container.selected {
+    background-color: #202327;
+  }
 </style>
 
 <div id="selected-users" class="p-2" style="display: block;">
@@ -55,13 +65,15 @@
     </div>
   </div>
   {#each selectedUsers as user}
-    <div class="user-container d-flex align-items-center justify-content-between mb-3 p-2" style="background-color:#202327;" on:click={() => selectUser(user)}>
+    <div class="user-container d-flex align-items-center justify-content-between mb-3 p-2"
+         class:selected={user === currentSelectedUser}
+         on:click={() => selectUser(user)}>
       <div class="d-flex align-items-center">
         <div class="me-3">
           <img src="/user-img.png" alt={user.username} class="rounded-circle" style="width: 40px; height: 40px;">
         </div>
         <div>
-          <span class="d-block" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 500; font-size: 15px; line-height: 20px; color: #e7e9ea;">@{user.username}</span>
+          <span class="d-block" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 700; font-size: 15px; line-height: 20px; color: #e7e9ea;">@{user.username}</span>
         </div>
       </div>
     </div>
