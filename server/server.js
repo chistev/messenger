@@ -9,6 +9,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const clientport = 5173
 const User = require('./models/User');
+const Message = require('./models/Message');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -147,6 +148,45 @@ app.get('/api/users/:userid', async (req, res) => {
       res.send(user);
   } catch (error) {
       res.status(500).send({ message: 'Server error' });
+  }
+});
+
+// POST route to save a message
+app.post('/api/messages/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { content, type } = req.body; // Timestamp can be automatically set by MongoDB
+
+  // Create a new Message object
+  const message = new Message({
+    content,
+    type,
+    sender: req.user._id, // Assuming you have user authentication and req.user._id is available
+    recipient: userId
+  });
+
+  try {
+    // Save the message to the database
+    const savedMessage = await message.save();
+    console.log(`Message saved - Sender: ${req.user._id}, Recipient: ${userId}, Timestamp: ${savedMessage.timestamp}`);
+    res.status(200).json(savedMessage);
+  } catch (err) {
+    console.error('Error saving message:', err);
+    res.status(500).json({ error: 'Failed to save message' });
+  }
+});
+
+// GET route to fetch messages for a specific user
+app.get('/api/messages/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const messages = await Message.find({ $or: [{ sender: userId }, { recipient: userId }] })
+                                  .sort({ timestamp: 1 });
+    console.log(`Messages fetched for User ID: ${userId}`, messages); // Log fetched messages
+    res.status(200).json({ messages });
+  } catch (err) {
+    console.error('Error fetching messages:', err);
+    res.status(500).json({ error: 'Failed to fetch messages' });
   }
 });
 

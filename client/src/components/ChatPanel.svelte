@@ -1,34 +1,61 @@
 <script>
-  import ChatContent from "./ChatContent.svelte";
   import { onMount } from "svelte";
+  import ChatContent from "./ChatContent.svelte";
 
+  // Define variables and functions
   export let currentChatUser;
 
   let newMessage = "";
   let messages = [];
 
-  // Function to handle form submission
-  function sendMessage(event) {
+  // Function to handle form submission and sending a message
+  async function sendMessage(event) {
     event.preventDefault();
     if (newMessage.trim()) {
-      messages = [...messages, { content: newMessage, type: "sent", timestamp: new Date() }];
-      newMessage = "";
+      // Create a message object
+      const message = {
+        content: newMessage,
+        type: "sent",
+        timestamp: new Date()
+      };
+
+      // Add the message to the UI immediately
+      messages = [...messages, message];
+      
+      // Save the message to the database
+      await saveMessage(message);
+
+      newMessage = ""; // Clear the input field after sending
     }
   }
 
-  // Mock data (You might want to fetch this from a database in a real application)
+  // Function to save the message to the database
+  async function saveMessage(message) {
+    try {
+      const response = await fetch(`/api/messages/${currentChatUser._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(message)
+      });
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+      console.log("Message sent and saved:", message); // Debugging statement
+    } catch (error) {
+      console.error('Error saving message:', error);
+      // Handle error as needed (e.g., show an error message)
+    }
+  }
+
+  // Initialize messages on mount (if needed)
   onMount(() => {
-    messages = [
-      { content: "Hello! How are you?", type: "received", timestamp: new Date("2023-06-07T10:00:00") },
-      { content: "I'm good, thank you! How about you?", type: "sent", timestamp: new Date("2023-06-07T10:02:00") },
-      { content: "I'm doing great! What are you up to?", type: "received", timestamp: new Date("2023-06-07T10:03:00") },
-      { content: "Just working on some projects. How's everything with you?", type: "sent", timestamp: new Date("2023-06-07T10:05:00") },
-      { content: "Same here. Just keeping busy with work.", type: "received", timestamp: new Date("2023-06-07T10:07:00") },
-      { content: "Hey, are you free to catch up this weekend?", type: "received", timestamp: new Date("2023-06-12T11:00:00") },
-      { content: "Yes, let's plan something!", type: "sent", timestamp: new Date("2023-06-12T11:05:00") }
-    ];
+    // You may fetch existing messages here if required
+    // Example: messages = fetchMessagesFromDatabase();
   });
 </script>
+
 
 <style>
   .border-right {
