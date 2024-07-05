@@ -1,5 +1,33 @@
 <script>
+  import ChatContent from "./ChatContent.svelte";
+  import { onMount } from "svelte";
+
   export let currentChatUser;
+
+  let newMessage = "";
+  let messages = [];
+
+  // Function to handle form submission
+  function sendMessage(event) {
+    event.preventDefault();
+    if (newMessage.trim()) {
+      messages = [...messages, { content: newMessage, type: "sent", timestamp: new Date() }];
+      newMessage = "";
+    }
+  }
+
+  // Mock data (You might want to fetch this from a database in a real application)
+  onMount(() => {
+    messages = [
+      { content: "Hello! How are you?", type: "received", timestamp: new Date("2023-06-07T10:00:00") },
+      { content: "I'm good, thank you! How about you?", type: "sent", timestamp: new Date("2023-06-07T10:02:00") },
+      { content: "I'm doing great! What are you up to?", type: "received", timestamp: new Date("2023-06-07T10:03:00") },
+      { content: "Just working on some projects. How's everything with you?", type: "sent", timestamp: new Date("2023-06-07T10:05:00") },
+      { content: "Same here. Just keeping busy with work.", type: "received", timestamp: new Date("2023-06-07T10:07:00") },
+      { content: "Hey, are you free to catch up this weekend?", type: "received", timestamp: new Date("2023-06-12T11:00:00") },
+      { content: "Yes, let's plan something!", type: "sent", timestamp: new Date("2023-06-12T11:05:00") }
+    ];
+  });
 </script>
 
 <style>
@@ -13,66 +41,7 @@
     opacity: 1;
     font-weight: bold;
   }
-
-  .message {
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 5px;
-    color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 20px;
-  }
-
-  .message.sent {
-    background-color: #1d9bf0;
-    align-self: flex-end;
-    text-align: right;
-  }
-
-  .message.received {
-    background-color: #2f3336;
-    color: #e7e9ea;
-    align-self: flex-start;
-  }
-
-  .timestamp {
-    font-size: 0.8rem;
-    color: #71767b;
-    margin-top: 2px;
-  }
-
-  .message.sent .timestamp {
-    color: #cce7ff; /* Change this color to something that contrasts well with the sent message background */
-  }
-
-  .date-separator {
-    text-align: center;
-    color: #71767b;
-    font-size: 0.9rem;
-    margin: 10px 0;
-    position: relative;
-  }
-
-  .date-separator::before,
-  .date-separator::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 40%;
-    height: 1px;
-    background-color: #71767b;
-  }
-
-  .date-separator::before {
-    left: 0;
-  }
-
-  .date-separator::after {
-    right: 0;
-  }
-
+  
   .chat-body {
     overflow-y: auto;
     flex-grow: 1;
@@ -112,48 +81,17 @@
     <span class="username ms-2" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 700; font-size: 17px; line-height: 20px; color: #e7e9ea;">{currentChatUser.username}</span>
   </div>
   <div class="chat-body mb-3 d-flex flex-column">
-    <!-- Date Separator -->
-    <div class="date-separator">7th June</div>
-    <!-- Placeholder messages -->
-    <div class="message received">
-      <div>Hello! How are you?</div>
-      <div class="timestamp">10:00 AM</div>
-    </div>
-    <div class="message sent">
-      <div>I'm good, thank you! How about you?</div>
-      <div class="timestamp">10:02 AM</div>
-    </div>
-    <div class="message received">
-      <div>I'm doing great! What are you up to?</div>
-      <div class="timestamp">10:03 AM</div>
-    </div>
-    <div class="message sent">
-      <div>Just working on some projects. How's everything with you?</div>
-      <div class="timestamp">10:05 AM</div>
-    </div>
-    <div class="message received">
-      <div>Same here. Just keeping busy with work.</div>
-      <div class="timestamp">10:07 AM</div>
-    </div>
-    <!-- New Date Separator -->
-    <div class="date-separator">12th June</div>
-    <!-- Placeholder messages -->
-    <div class="message received">
-      <div>Hey, are you free to catch up this weekend?</div>
-      <div class="timestamp">11:00 AM</div>
-    </div>
-    <div class="message sent">
-      <div>Yes, let's plan something!</div>
-      <div class="timestamp">11:05 AM</div>
-    </div>
+    <ChatContent {messages}/>
   </div>
   <div class="chat-footer d-flex align-items-center">
-    <div class="input-container">
+    <form class="input-container" on:submit={sendMessage}>
       <i class="bi bi-file-image text-primary ms-2 me-3"></i>
       <i class="bi bi-filetype-gif text-primary me-3"></i>
       <i class="bi bi-emoji-smile text-primary me-3"></i>
-      <textarea class="form-control" placeholder="Start a new message"></textarea>
-      <i class="bi bi-send text-primary ms-3"></i>
-    </div>
+      <textarea bind:value={newMessage} class="form-control" placeholder="Start a new message"></textarea>
+      <button type="submit" style="background: none; border: none; padding: 0;">
+        <i class="bi bi-send text-primary ms-3"></i>
+      </button>
+    </form>
   </div>
 </div>
