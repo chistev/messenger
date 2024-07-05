@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+   import { onMount, afterUpdate } from "svelte";
   import ChatContent from "./ChatContent.svelte";
 
   // Define variables and functions
@@ -15,8 +15,7 @@
       // Create a message object
       const message = {
         content: newMessage,
-        type: "sent",
-        timestamp: new Date()
+        type: "sent"
       };
 
       // Add the message to the UI immediately
@@ -49,13 +48,29 @@
     }
   }
 
-  // Initialize messages on mount (if needed)
-  onMount(() => {
-    // You may fetch existing messages here if required
-    // Example: messages = fetchMessagesFromDatabase();
-  });
-</script>
+  // Function to fetch messages from the database
+  async function fetchMessages() {
+    try {
+      const response = await fetch(`/api/messages/${currentChatUser._id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+      const data = await response.json();
+      messages = data.messages.map(message => ({
+      ...message,
+      timestamp: new Date(message.timestamp)
+    })); // Update messages with fetched data and convert timestamps to Date objects
+      console.log(`Messages fetched for User ID: ${currentChatUser._id}`, messages.content); // Debugging statement
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      // Handle error as needed (e.g., show an error message)
+    }
+  }
 
+   // Initialize messages on mount and when currentChatUser changes
+   onMount(fetchMessages);
+  afterUpdate(fetchMessages);
+</script>
 
 <style>
   .border-right {
@@ -122,3 +137,4 @@
     </form>
   </div>
 </div>
+"

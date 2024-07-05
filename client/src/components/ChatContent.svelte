@@ -24,7 +24,8 @@
   
     // Function to format timestamp to HH:mm (hours and minutes)
     function formatTimestamp(timestamp) {
-      return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (!timestamp) return ''; // Handle undefined case
+      return new Date(timestamp).toLocaleDateString();
     }
   </script>  
   <style>
@@ -100,8 +101,8 @@
   
   <div class="message-container" bind:this={messageContainer}>
     {#each messages as message, index}
-      {#if index === 0 || (index > 0 && messages[index - 1].timestamp.toDateString() !== message.timestamp.toDateString())}
-        <div class="date-separator">{message.timestamp.toLocaleDateString()}</div>
+      {#if index === 0 || (index > 0 && messages[index - 1].timestamp?.toDateString() !== message.timestamp?.toDateString())}
+        <div class="date-separator">{message.timestamp?.toLocaleDateString()}</div>
       {/if}
       <div class="message {message.type}">
         <div>{@html message.content.replace(/\n/g, '<br>')}</div>
