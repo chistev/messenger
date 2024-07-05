@@ -2,8 +2,8 @@
     import { onMount, afterUpdate } from 'svelte';
   
     export let messages = [];
-  
     let messageContainer;
+    let loggedInUserId = '';
   
     // Function to scroll to the bottom of the message container
     function scrollToBottom() {
@@ -15,6 +15,7 @@
     // Scroll to the bottom when the component mounts
     onMount(() => {
       scrollToBottom();
+      fetchLoggedInUserId(); // Fetch the logged in user ID on component mount
     });
   
     // Watch for changes to the messages array and scroll to bottom after update
@@ -22,13 +23,33 @@
       scrollToBottom();
     });
   
+    // Function to fetch logged in user ID from server
+    async function fetchLoggedInUserId() {
+      try {
+        const response = await fetch('/api/loggedInUserId');
+        const data = await response.json();
+        loggedInUserId = data.loggedInUserId;
+      } catch (error) {
+        console.error('Error fetching loggedInUserId:', error);
+        // Handle error as needed
+      }
+    }
+  
     // Function to format timestamp to HH:mm (hours and minutes)
     function formatTimestamp(timestamp) {
       if (!timestamp) return ''; // Handle undefined case
-      return new Date(timestamp).toLocaleDateString();
+      return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
-  </script>  
+  
+    // Function to determine message type ('sent' or 'received')
+    function getMessageType(message) {
+      if (!loggedInUserId) return ''; // Handle initial load where loggedInUserId might not be fetched yet
+      return message.sender === loggedInUserId ? 'sent' : 'received';
+    }
+  </script>
+  
   <style>
+    /* Your existing message styles */
     .message {
       padding: 10px;
       border-radius: 10px;
@@ -104,9 +125,10 @@
       {#if index === 0 || (index > 0 && messages[index - 1].timestamp?.toDateString() !== message.timestamp?.toDateString())}
         <div class="date-separator">{message.timestamp?.toLocaleDateString()}</div>
       {/if}
-      <div class="message {message.type}">
+      <div class="message {getMessageType(message)}">
         <div>{@html message.content.replace(/\n/g, '<br>')}</div>
         <div class="timestamp">{formatTimestamp(message.timestamp)}</div>
       </div>
     {/each}
   </div>
+  

@@ -190,6 +190,24 @@ app.get('/api/messages/:userId', async (req, res) => {
   }
 });
 
+// Serve the Svelte application
+app.get('/api/loggedInUserId', async (req, res) => {
+  try {
+    // Fetch the user from the database based on req.user (assuming it's populated after authentication)
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      throw new Error('User not found'); // Handle the case where user is not found
+    }
+    console.log(user + "this is the user")
+    // Send the user ID to the client-side
+    res.json({ loggedInUserId: user._id });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
+
 
 
 app.listen(port, () => {
