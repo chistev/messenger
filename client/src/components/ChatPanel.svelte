@@ -1,27 +1,25 @@
 <script>
-   import { onMount, afterUpdate } from "svelte";
+  import { onMount, onDestroy, beforeUpdate } from "svelte";
   import ChatContent from "./ChatContent.svelte";
 
-  // Define variables and functions
   export let currentChatUser;
 
   let newMessage = "";
   let messages = [];
+  let previousUserId = "";
 
   // Function to handle form submission and sending a message
   async function sendMessage(event) {
     event.preventDefault();
     if (newMessage.trim()) {
-      // Create a message object
       const message = {
         content: newMessage,
-        type: "sent"
+        type: "sent",
+        timestamp: new Date()
       };
 
-      // Add the message to the UI immediately
       messages = [...messages, message];
       
-      // Save the message to the database
       await saveMessage(message);
 
       newMessage = ""; // Clear the input field after sending
@@ -44,7 +42,6 @@
       console.log("Message sent and saved:", message); // Debugging statement
     } catch (error) {
       console.error('Error saving message:', error);
-      // Handle error as needed (e.g., show an error message)
     }
   }
 
@@ -57,19 +54,26 @@
       }
       const data = await response.json();
       messages = data.messages.map(message => ({
-      ...message,
-      timestamp: new Date(message.timestamp)
-    })); // Update messages with fetched data and convert timestamps to Date objects
-      console.log(`Messages fetched for User ID: ${currentChatUser._id}`, messages.content); // Debugging statement
+        ...message,
+        timestamp: new Date(message.timestamp)
+      })); // Update messages with fetched data and convert timestamps to Date objects
+      console.log(`Messages fetched for User ID: ${currentChatUser._id}`, messages); // Debugging statement
     } catch (error) {
       console.error('Error fetching messages:', error);
-      // Handle error as needed (e.g., show an error message)
     }
   }
 
-   // Initialize messages on mount and when currentChatUser changes
-   onMount(fetchMessages);
-  afterUpdate(fetchMessages);
+  // Fetch messages when the component mounts or when currentChatUser changes
+  beforeUpdate(() => {
+    if (currentChatUser._id !== previousUserId) {
+      fetchMessages();
+      previousUserId = currentChatUser._id;
+    }
+  });
+
+  onMount(() => {
+    fetchMessages();
+  });
 </script>
 
 <style>
@@ -137,4 +141,3 @@
     </form>
   </div>
 </div>
-"
