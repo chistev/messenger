@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy, beforeUpdate } from "svelte";
+  import { onMount, beforeUpdate, afterUpdate } from "svelte";
   import ChatContent from "./ChatContent.svelte";
 
   export let currentChatUser;
@@ -7,9 +7,8 @@
   let newMessage = "";
   let messages = [];
   let previousUserId = "";
-  let loggedInUserId = ''; // Add this to store the logged-in user ID
+  let loggedInUserId = '';
 
-  // Function to handle form submission and sending a message
   async function sendMessage(event) {
     event.preventDefault();
     if (newMessage.trim()) {
@@ -28,7 +27,6 @@
     }
   }
 
-  // Function to save the message to the database
   async function saveMessage(message) {
     try {
       const response = await fetch(`/api/messages/${currentChatUser._id}`, {
@@ -47,7 +45,6 @@
     }
   }
 
-  // Function to fetch messages from the database
   async function fetchMessages() {
     try {
       const response = await fetch(`/api/messages/${currentChatUser._id}`);
@@ -65,7 +62,6 @@
     }
   }
 
-  // Function to fetch logged in user ID from server
   async function fetchLoggedInUserId() {
     try {
       const response = await fetch('/api/loggedInUserId');
@@ -73,11 +69,9 @@
       loggedInUserId = data.loggedInUserId;
     } catch (error) {
       console.error('Error fetching loggedInUserId:', error);
-      // Handle error as needed
     }
   }
 
-  // Fetch messages when the component mounts or when currentChatUser changes
   beforeUpdate(() => {
     if (currentChatUser._id !== previousUserId) {
       fetchMessages();
@@ -88,6 +82,10 @@
   onMount(() => {
     fetchMessages();
     fetchLoggedInUserId(); // Fetch the logged in user ID on component mount
+  });
+
+  afterUpdate(() => {
+    // No longer needed for loading state management
   });
 </script>
 
