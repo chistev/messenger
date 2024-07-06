@@ -35,10 +35,16 @@
     .direct-search-input-container {
       display: flex;
       align-items: center;
-      border: 1px solid #35363a;
+      border: 1px solid #35363a; /* Default border color */
       border-radius: 25px;
       padding: 5px 15px;
       width: 100%;
+      transition: border-color 0.3s ease; /* Add transition for smooth effect */
+    }
+  
+    .direct-search-input-container:focus-within {
+      border: 2px solid #1d9bf0; /* Change border color when input or container is focused */
+      caret-color: #1d9bf0; /* Change cursor color to match border color */
     }
   
     .direct-search-input {
@@ -50,9 +56,8 @@
     }
   
     .direct-search-input:focus {
-      background: transparent;
       box-shadow: none;
-      color: #e7e9ea;
+      border-color: transparent; /* Optionally hide input border when focused */
     }
   
     .direct-search-input::placeholder {

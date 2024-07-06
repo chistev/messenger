@@ -38,7 +38,7 @@
   }
 </style>
 
-<div id="selected-users" class="p-2" style="display: block;">
+<div id="selected-users">
   <DirectMessageSearch/>
   {#each selectedUsers as user}
     <div class="user-container d-flex align-items-center justify-content-between mb-3 p-2"
