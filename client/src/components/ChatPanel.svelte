@@ -144,12 +144,9 @@
   </div>
   <div class="chat-footer d-flex align-items-center">
     <form class="input-container" on:submit={sendMessage}>
-      <i class="bi bi-file-image text-primary ms-2 me-3"></i>
-      <i class="bi bi-filetype-gif text-primary me-3"></i>
-      <i class="bi bi-emoji-smile text-primary me-3"></i>
       <textarea bind:value={newMessage} class="form-control" placeholder="Start a new message"></textarea>
       <button type="submit" style="background: none; border: none; padding: 0;">
-        <i class="bi bi-send text-primary ms-3"></i>
+        <i class="bi bi-send text-primary me-3"></i>
       </button>
     </form>
   </div>
