@@ -7,6 +7,7 @@
   let newMessage = "";
   let messages = [];
   let previousUserId = "";
+  let loggedInUserId = ''; // Add this to store the logged-in user ID
 
   // Function to handle form submission and sending a message
   async function sendMessage(event) {
@@ -15,6 +16,7 @@
       const message = {
         content: newMessage,
         type: "sent",
+        sender: loggedInUserId, // Set the sender field
         timestamp: new Date()
       };
 
@@ -63,6 +65,18 @@
     }
   }
 
+  // Function to fetch logged in user ID from server
+  async function fetchLoggedInUserId() {
+    try {
+      const response = await fetch('/api/loggedInUserId');
+      const data = await response.json();
+      loggedInUserId = data.loggedInUserId;
+    } catch (error) {
+      console.error('Error fetching loggedInUserId:', error);
+      // Handle error as needed
+    }
+  }
+
   // Fetch messages when the component mounts or when currentChatUser changes
   beforeUpdate(() => {
     if (currentChatUser._id !== previousUserId) {
@@ -73,6 +87,7 @@
 
   onMount(() => {
     fetchMessages();
+    fetchLoggedInUserId(); // Fetch the logged in user ID on component mount
   });
 </script>
 
