@@ -9,6 +9,7 @@
     // State variables
     let searchInput = '';
     let isInputFocused = false;
+    let isBackIconVisible = false;
   
     // Function to handle user search
     function handleSearch(event) {
@@ -19,11 +20,13 @@
     // Function to handle input focus
     function handleFocus() {
       isInputFocused = true;
+      isBackIconVisible = true; // Show the back icon when input is focused
     }
   
     // Function to handle input blur
     function handleBlur() {
       isInputFocused = false;
+      // Keep isBackIconVisible true to keep the back icon visible
     }
   
     // Function to select user and update URL
@@ -34,7 +37,8 @@
       // Update the URL
       history.pushState(null, '', `/messages/${user._id}`);
     }
-  </script>  
+  </script>
+  
   <style>
     .form-control::placeholder {
       color: #e7e9ea;
@@ -77,11 +81,11 @@
   </style>
   
   <div class="p-2 mb-1">
-    <div class="d-flex">
+    <div class="d-flex align-items-center">
       <div>
-        <!-- Back icon will only show when input is focused -->
-        {#if isInputFocused}
-          <i class="bi bi-arrow-left direct-search-icon fs-3 me-3" style="color: #cacdce;"></i>
+        <!-- Back icon will show when input is focused and remain visible -->
+        {#if isBackIconVisible}
+          <i class="bi bi-arrow-left direct-search-icon fs-5 me-3" style="color: #cacdce;"></i>
         {/if}
       </div>
       <div class="direct-search-input-container">
@@ -98,3 +102,4 @@
       </div>
     </div>
   </div>
+  
