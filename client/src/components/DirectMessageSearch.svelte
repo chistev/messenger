@@ -6,8 +6,9 @@
     export let selectedUsers = [];
     const dispatch = createEventDispatcher();
   
-    // State variable for search input value
+    // State variables
     let searchInput = '';
+    let isInputFocused = false;
   
     // Function to handle user search
     function handleSearch(event) {
@@ -15,7 +16,17 @@
       // You can implement search logic here if needed
     }
   
-    // Function to handle user selection
+    // Function to handle input focus
+    function handleFocus() {
+      isInputFocused = true;
+    }
+  
+    // Function to handle input blur
+    function handleBlur() {
+      isInputFocused = false;
+    }
+  
+    // Function to select user and update URL
     function selectUser(user) {
       // Emit an event to notify the parent component
       dispatch('selectUser', user);
@@ -23,8 +34,7 @@
       // Update the URL
       history.pushState(null, '', `/messages/${user._id}`);
     }
-  </script>
-  
+  </script>  
   <style>
     .form-control::placeholder {
       color: #e7e9ea;
@@ -67,9 +77,24 @@
   </style>
   
   <div class="p-2 mb-1">
-    <div class="direct-search-input-container">
-      <i class="bi bi-search me-2"></i>
-      <input type="text" class="form-control direct-search-input" bind:value={searchInput} placeholder="Search Direct Messages" on:input={handleSearch}>
+    <div class="d-flex">
+      <div>
+        <!-- Back icon will only show when input is focused -->
+        {#if isInputFocused}
+          <i class="bi bi-arrow-left direct-search-icon fs-3 me-3" style="color: #cacdce;"></i>
+        {/if}
+      </div>
+      <div class="direct-search-input-container">
+        <i class="bi bi-search me-2"></i>
+        <input
+          type="text"
+          class="form-control direct-search-input"
+          bind:value={searchInput}
+          placeholder="Search Direct Messages"
+          on:input={handleSearch}
+          on:focus={handleFocus}
+          on:blur={handleBlur}
+        />
+      </div>
     </div>
   </div>
-  
