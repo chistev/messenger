@@ -1,8 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  // Define props and variables
-  export let selectedUsers = [];
   const dispatch = createEventDispatcher();
 
   // State variables
@@ -29,13 +27,11 @@
     // Keep isBackIconVisible true to keep the back icon visible
   }
 
-  // Function to select user and update URL
-  function selectUser(user) {
-    // Emit an event to notify the parent component
-    dispatch('selectUser', user);
-
-    // Update the URL
-    history.pushState(null, '', `/messages/${user._id}`);
+  // Function to handle back button click
+  function handleBackClick() {
+    isInputFocused = false;
+    isBackIconVisible = false; // Hide the back icon
+    dispatch('back'); // Notify parent component to render UserList
   }
 </script>
 
@@ -78,14 +74,30 @@
     color: #71767b;
     font-weight: 100;
   }
+
+  .back-button {
+    background: none;
+    border: none;
+    color: #cacdce;
+    cursor: pointer;
+    padding: 0;
+    margin-right: 0.5rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-button:hover {
+    color: #e7e9ea;
+  }
 </style>
 
 <div class="p-2 mb-1">
   <div class="d-flex align-items-center">
     <div>
-      <!-- Back icon will show when input is focused and remain visible -->
+      <!-- Back button will show when input is focused and remain visible -->
       {#if isBackIconVisible}
-        <i class="bi bi-arrow-left direct-search-icon fs-5 me-3" style="color: #cacdce;"></i>
+        <button class="back-button" on:click={handleBackClick}>
+          <i class="bi bi-arrow-left direct-search-icon fs-5"></i>
+        </button>
       {/if}
     </div>
     <div class="direct-search-input-container">
