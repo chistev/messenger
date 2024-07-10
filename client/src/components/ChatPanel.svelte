@@ -95,42 +95,24 @@
     };
 
     socket.onmessage = (event) => {
-      console.log("Message received from WebSocket:", event.data);
+  console.log("Message received from WebSocket:", event.data);
 
-      if (typeof event.data === 'string') {
-        try {
-          const receivedMessage = JSON.parse(event.data);
-          receivedMessage.timestamp = new Date(receivedMessage.timestamp);
+  try {
+    let receivedMessage = JSON.parse(event.data);
+    receivedMessage.timestamp = new Date(receivedMessage.timestamp);
 
-          // Check if message already exists and ensure it's not from the logged-in user
-          if (receivedMessage.sender !== loggedInUserId && !messages.find(msg => msg._id === receivedMessage._id)) {
-        messages = [...messages, receivedMessage];
-        console.log('Parsed received message:', receivedMessage);
-      }
-    } catch (error) {
-      console.error('Error parsing JSON from WebSocket message:', error);
+    const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
+
+    if (receivedMessage.recipient === loggedInUserId && !isDuplicate) {
+      messages = [...messages, receivedMessage];
+      console.log('Parsed received message:', receivedMessage);
+    } else {
+      console.log('Duplicate message received or not intended for the current user.');
     }
-      } else if (event.data instanceof Blob) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const text = reader.result;
-          try {
-            const receivedMessage = JSON.parse(text);
-            receivedMessage.timestamp = new Date(receivedMessage.timestamp);
-
-            if (!messages.find(msg => msg._id === receivedMessage._id)) {
-              messages = [...messages, receivedMessage];
-              console.log('Parsed received message from Blob:', receivedMessage);
-            }
-          } catch (error) {
-            console.error('Error parsing JSON from Blob:', error);
-          }
-        };
-        reader.readAsText(event.data);
-      } else {
-        console.warn('Received unexpected data type from WebSocket:', typeof event.data);
-      }
-    };
+  } catch (error) {
+    console.error('Error parsing JSON from WebSocket message:', error);
+  }
+};
 
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
