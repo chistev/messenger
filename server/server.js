@@ -230,6 +230,14 @@ app.post('/api/messages/:userId', async (req, res) => {
   try {
     const savedMessage = await message.save();
     console.log(`Message saved - Sender: ${req.user._id}, Recipient: ${userId}, Timestamp: ${savedMessage.timestamp}`);
+    
+    // Broadcast the saved message to all connected clients
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(savedMessage));
+      }
+    });
+
     res.status(200).json(savedMessage);
   } catch (err) {
     console.error('Error saving message:', err);
