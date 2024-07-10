@@ -154,14 +154,51 @@ app.post('/api/select-user', async (req, res) => {
   }
 });
 
+// Route to fetch selected users with last message timestamp
 app.get('/api/selected-users', async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate('selectedUsers');
+    const loggedInUserId = req.user._id; // Assuming user is authenticated and user ID is available
+    console.log(`Fetching selected users for logged in user ID: ${loggedInUserId}`);
+
+    // Fetch the logged in user and populate selectedUsers
+    const user = await User.findById(loggedInUserId).populate('selectedUsers');
     if (!user) {
+      console.log(`User not found with ID: ${loggedInUserId}`);
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json({ selectedUsers: user.selectedUsers });
+
+    // Calculate last message timestamps for each selected user
+    const selectedUsersWithTimestamp = await Promise.all(
+      user.selectedUsers.map(async (selectedUser) => {
+        // Find the last message either sent or received by the logged in user and the selected user
+        const lastMessage = await Message.findOne({
+          $or: [
+            { sender: loggedInUserId, recipient: selectedUser._id },
+            { sender: selectedUser._id, recipient: loggedInUserId }
+          ]
+        }).sort({ timestamp: -1 });
+
+        console.log(`Selected user: ${selectedUser._id}, Last message timestamp: ${lastMessage ? lastMessage.timestamp : 'No message found'}`);
+
+        return {
+          ...selectedUser.toObject(),
+          lastMessageTimestamp: lastMessage ? lastMessage.timestamp : null
+        };
+      })
+    );
+
+    // Sort selected users by lastMessageTimestamp in descending order
+    selectedUsersWithTimestamp.sort((a, b) => {
+      if (!a.lastMessageTimestamp) return 1; // Move users with no messages to the end
+      if (!b.lastMessageTimestamp) return -1; // Move users with no messages to the end
+      return b.lastMessageTimestamp - a.lastMessageTimestamp;
+    });
+
+    console.log('Selected users with last message timestamps:', selectedUsersWithTimestamp);
+
+    res.json({ selectedUsers: selectedUsersWithTimestamp });
   } catch (err) {
+    console.error('Error fetching selected users:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -227,6 +264,8 @@ app.get('/api/loggedInUserId', async (req, res) => {
     res.status(500).json({ error: 'Server Error' });
   }
 });
+
+
 
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

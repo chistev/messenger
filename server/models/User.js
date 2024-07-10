@@ -4,7 +4,8 @@ const UserSchema = new mongoose.Schema({
   googleId: String,
   email: String,
   username: String,
-  selectedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] // Updated to an array of selected users
+  selectedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Updated to an array of selected users
+  lastMessageTimestamp: Date
 });
 
 module.exports = mongoose.model('User', UserSchema);
