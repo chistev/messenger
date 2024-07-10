@@ -13,7 +13,7 @@
 
   onMount(() => {
     scrollToBottom();
-    fetchLoggedInUserId(); // Fetch the logged in user ID on component mount
+    fetchLoggedInUserId();
   });
 
   afterUpdate(() => {
@@ -31,13 +31,12 @@
   }
 
   function formatTimestamp(timestamp) {
-  if (!timestamp || !(timestamp instanceof Date)) return ''; // Handle undefined or non-Date case
-  return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
+    if (!timestamp || !(timestamp instanceof Date)) return '';
+    return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
 
   function getMessageType(message) {
-    if (!loggedInUserId) return ''; // Handle initial load where loggedInUserId might not be fetched yet
+    if (!loggedInUserId) return '';
     return message.sender === loggedInUserId ? 'sent' : 'received';
   }
 </script>

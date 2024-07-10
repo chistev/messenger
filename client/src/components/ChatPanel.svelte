@@ -14,21 +14,27 @@
     event.preventDefault();
     if (newMessage.trim()) {
       const message = {
+        _id: generateUniqueId(),  // Assign a unique ID to the message
         content: newMessage,
         type: "sent",
-        sender: loggedInUserId, // Set the sender field
+        sender: loggedInUserId,
+        recipient: currentChatUser._id,  // Include recipient ID
         timestamp: new Date()
       };
 
       messages = [...messages, message];
 
       console.log("Sending message through WebSocket:", message);
-      socket.send(JSON.stringify(message)); // Send the message through WebSocket
+      socket.send(JSON.stringify(message));
 
       await saveMessage(message);
 
       newMessage = ""; // Clear the input field after sending
     }
+  }
+
+  function generateUniqueId() {
+    return '_' + Math.random().toString(36).substr(2, 9);
   }
 
   async function saveMessage(message) {
@@ -43,7 +49,7 @@
       if (!response.ok) {
         throw new Error('Failed to send message');
       }
-      console.log("Message sent and saved:", message); // Debugging statement
+      console.log("Message sent and saved:", message);
     } catch (error) {
       console.error('Error saving message:', error);
     }
@@ -59,8 +65,8 @@
       messages = data.messages.map(message => ({
         ...message,
         timestamp: new Date(message.timestamp)
-      })); // Update messages with fetched data and convert timestamps to Date objects
-      console.log(`Messages fetched for User ID: ${currentChatUser._id}`, messages); // Debugging statement
+      }));
+      console.log(`Messages fetched for User ID: ${currentChatUser._id}`, messages);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
@@ -82,7 +88,7 @@
     fetchLoggedInUserId();
 
     console.log("Attempting to connect to WebSocket server...");
-    socket = new WebSocket('ws://localhost:3000'); // Connect to the WebSocket server
+    socket = new WebSocket('ws://localhost:3000');
 
     socket.onopen = () => {
       console.log("WebSocket connection established");
@@ -91,27 +97,31 @@
     socket.onmessage = (event) => {
       console.log("Message received from WebSocket:", event.data);
 
-      // Handle different data types received from WebSocket
       if (typeof event.data === 'string') {
-        // If it's a string, assume it's JSON and parse it
         try {
           const receivedMessage = JSON.parse(event.data);
-          receivedMessage.timestamp = new Date(receivedMessage.timestamp); // Convert timestamp to Date object
-          messages = [...messages, receivedMessage];
-          console.log('Parsed received message:', receivedMessage);
-        } catch (error) {
-          console.error('Error parsing JSON from WebSocket message:', error);
-        }
+          receivedMessage.timestamp = new Date(receivedMessage.timestamp);
+
+          // Check if message already exists and ensure it's not from the logged-in user
+          if (receivedMessage.sender !== loggedInUserId && !messages.find(msg => msg._id === receivedMessage._id)) {
+        messages = [...messages, receivedMessage];
+        console.log('Parsed received message:', receivedMessage);
+      }
+    } catch (error) {
+      console.error('Error parsing JSON from WebSocket message:', error);
+    }
       } else if (event.data instanceof Blob) {
-        // Handle Blob data type if necessary
         const reader = new FileReader();
         reader.onload = () => {
           const text = reader.result;
           try {
             const receivedMessage = JSON.parse(text);
-            receivedMessage.timestamp = new Date(receivedMessage.timestamp); // Convert timestamp to Date object
-            messages = [...messages, receivedMessage];
-            console.log('Parsed received message from Blob:', receivedMessage);
+            receivedMessage.timestamp = new Date(receivedMessage.timestamp);
+
+            if (!messages.find(msg => msg._id === receivedMessage._id)) {
+              messages = [...messages, receivedMessage];
+              console.log('Parsed received message from Blob:', receivedMessage);
+            }
           } catch (error) {
             console.error('Error parsing JSON from Blob:', error);
           }
