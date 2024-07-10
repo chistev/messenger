@@ -31,9 +31,10 @@
   }
 
   function formatTimestamp(timestamp) {
-    if (!timestamp) return ''; // Handle undefined case
-    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+  if (!timestamp || !(timestamp instanceof Date)) return ''; // Handle undefined or non-Date case
+  return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 
   function getMessageType(message) {
     if (!loggedInUserId) return ''; // Handle initial load where loggedInUserId might not be fetched yet

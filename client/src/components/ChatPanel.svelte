@@ -1,5 +1,5 @@
 <script>
-  import { onMount, beforeUpdate, afterUpdate } from "svelte";
+  import { onMount, beforeUpdate } from "svelte";
   import ChatContent from "./ChatContent.svelte";
 
   export let currentChatUser;
@@ -8,6 +8,7 @@
   let messages = [];
   let previousUserId = "";
   let loggedInUserId = '';
+  let socket;
 
   async function sendMessage(event) {
     event.preventDefault();
@@ -20,7 +21,10 @@
       };
 
       messages = [...messages, message];
-      
+
+      console.log("Sending message through WebSocket:", message);
+      socket.send(JSON.stringify(message)); // Send the message through WebSocket
+
       await saveMessage(message);
 
       newMessage = ""; // Clear the input field after sending
@@ -67,25 +71,71 @@
       const response = await fetch('/api/loggedInUserId');
       const data = await response.json();
       loggedInUserId = data.loggedInUserId;
+      console.log("Logged in user ID fetched:", loggedInUserId);
     } catch (error) {
       console.error('Error fetching loggedInUserId:', error);
     }
   }
+
+  onMount(() => {
+    fetchMessages();
+    fetchLoggedInUserId();
+
+    console.log("Attempting to connect to WebSocket server...");
+    socket = new WebSocket('ws://localhost:3000'); // Connect to the WebSocket server
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    socket.onmessage = (event) => {
+      console.log("Message received from WebSocket:", event.data);
+
+      // Handle different data types received from WebSocket
+      if (typeof event.data === 'string') {
+        // If it's a string, assume it's JSON and parse it
+        try {
+          const receivedMessage = JSON.parse(event.data);
+          receivedMessage.timestamp = new Date(receivedMessage.timestamp); // Convert timestamp to Date object
+          messages = [...messages, receivedMessage];
+          console.log('Parsed received message:', receivedMessage);
+        } catch (error) {
+          console.error('Error parsing JSON from WebSocket message:', error);
+        }
+      } else if (event.data instanceof Blob) {
+        // Handle Blob data type if necessary
+        const reader = new FileReader();
+        reader.onload = () => {
+          const text = reader.result;
+          try {
+            const receivedMessage = JSON.parse(text);
+            receivedMessage.timestamp = new Date(receivedMessage.timestamp); // Convert timestamp to Date object
+            messages = [...messages, receivedMessage];
+            console.log('Parsed received message from Blob:', receivedMessage);
+          } catch (error) {
+            console.error('Error parsing JSON from Blob:', error);
+          }
+        };
+        reader.readAsText(event.data);
+      } else {
+        console.warn('Received unexpected data type from WebSocket:', typeof event.data);
+      }
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = (event) => {
+      console.log("WebSocket connection closed:", event);
+    };
+  });
 
   beforeUpdate(() => {
     if (currentChatUser._id !== previousUserId) {
       fetchMessages();
       previousUserId = currentChatUser._id;
     }
-  });
-
-  onMount(() => {
-    fetchMessages();
-    fetchLoggedInUserId(); // Fetch the logged in user ID on component mount
-  });
-
-  afterUpdate(() => {
-    // No longer needed for loading state management
   });
 </script>
 

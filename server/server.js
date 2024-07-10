@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const WebSocket = require('ws');
 const app = express();
 const port = 3000;
 const { createServer } = require('http');
@@ -7,7 +8,7 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const clientport = 5173
+const clientport = 5173;
 const User = require('./models/User');
 const Message = require('./models/Message');
 
@@ -22,6 +23,39 @@ connectDB();
 const initializePassport = require('./config/passport');
 initializePassport(passport);
 const server = createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws) => {
+  console.log('WebSocket client connected');
+
+  ws.on('message', (message) => {
+    console.log(`Received message => ${message}`);
+
+    // Attempt to parse the received message
+    try {
+      const parsedMessage = JSON.parse(message);
+      console.log('Parsed message:', parsedMessage);
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+    }
+
+    // Broadcast message to all connected clients
+    wss.clients.forEach((client) => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+        console.log(`Sent message => ${message}`);
+      }
+    });
+  });
+
+  ws.on('close', () => {
+    console.log('WebSocket client disconnected');
+  });
+
+  ws.on('error', (error) => {
+    console.error('WebSocket error:', error);
+  });
+});
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -54,7 +88,6 @@ const usernameRoutes = require('./controllers/authControllers/usernameRoutes');
 app.use('/', authRoutes);
 app.use('/', usernameRoutes);
 
-
 // Serve static files from the 'client/public' folder (where Svelte outputs files)
 app.use(express.static(path.join(__dirname, '../client/static')));
 
@@ -68,7 +101,6 @@ app.get('/api/users', async (req, res) => {
   const currentUserUsername = req.user.username; 
 
    try {
-    // Fetch the current user to get the selectedUsers array
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
@@ -78,11 +110,10 @@ app.get('/api/users', async (req, res) => {
     const selectedUserIds = currentUser.selectedUsers.map(user => user._id);
     console.log('Selected users to exclude:', selectedUserIds);
 
-    // Find users matching the query but exclude the current user and selected users
     const users = await User.find({ 
       username: new RegExp(username, 'i'), 
-      username: { $ne: currentUserUsername }, // Exclude the current user's username
-      _id: { $nin: selectedUserIds } // Exclude already selected users
+      username: { $ne: currentUserUsername },
+      _id: { $nin: selectedUserIds }
     }).limit(10);
 
     res.json(users);
@@ -94,25 +125,22 @@ app.get('/api/users', async (req, res) => {
 
 app.post('/api/select-user', async (req, res) => {
   const { selectedUserId } = req.body;
-  const currentUser = req.user; // Access current authenticated user from req.user
+  const currentUser = req.user;
 
   if (!currentUser) {
     return res.status(401).json({ error: 'User not authenticated' });
   }
 
   try {
-    // Fetch the user to log the existing selected users
     const user = await User.findById(currentUser._id);
     if (!user) {
       console.log(`User ${currentUser._id} not found`);
       return res.status(404).send('User not found');
     }
 
-    // Attempt to update the user
     console.log(`Attempting to update user ${currentUser._id} to add selected user ${selectedUserId}`);
-    await User.findByIdAndUpdate(currentUser._id, { $addToSet: { selectedUsers: selectedUserId } }); // Updated to add to the selectedUsers array
+    await User.findByIdAndUpdate(currentUser._id, { $addToSet: { selectedUsers: selectedUserId } });
     
-    // Fetch the updated user to log the new selected users
     const updatedUser = await User.findById(currentUser._id);
     if (updatedUser) {
       console.log(`Updated selected users for user ${currentUser._id}:`, updatedUser.selectedUsers);
@@ -141,31 +169,28 @@ app.get('/api/selected-users', async (req, res) => {
 app.get('/api/users/:userid', async (req, res) => {
   console.log("route hit")
   try {
-      const user = await User.findById(req.params.userid);
-      if (!user) {
-          return res.status(404).send({ message: 'User not found' });
-      }
-      res.send(user);
+    const user = await User.findById(req.params.userid);
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+    res.send(user);
   } catch (error) {
-      res.status(500).send({ message: 'Server error' });
+    res.status(500).send({ message: 'Server error' });
   }
 });
 
-// POST route to save a message
 app.post('/api/messages/:userId', async (req, res) => {
   const { userId } = req.params;
-  const { content, type } = req.body; // Timestamp can be automatically set by MongoDB
+  const { content, type } = req.body;
 
-  // Create a new Message object
   const message = new Message({
     content,
     type,
-    sender: req.user._id, // Assuming you have user authentication and req.user._id is available
+    sender: req.user._id,
     recipient: userId
   });
 
   try {
-    // Save the message to the database
     const savedMessage = await message.save();
     console.log(`Message saved - Sender: ${req.user._id}, Recipient: ${userId}, Timestamp: ${savedMessage.timestamp}`);
     res.status(200).json(savedMessage);
@@ -175,14 +200,13 @@ app.post('/api/messages/:userId', async (req, res) => {
   }
 });
 
-// GET route to fetch messages for a specific user
 app.get('/api/messages/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
     const messages = await Message.find({ $or: [{ sender: userId }, { recipient: userId }] })
                                   .sort({ timestamp: 1 });
-    console.log(`Messages fetched for User ID: ${userId}`, messages); // Log fetched messages
+    console.log(`Messages fetched for User ID: ${userId}`, messages);
     res.status(200).json({ messages });
   } catch (err) {
     console.error('Error fetching messages:', err);
@@ -190,16 +214,13 @@ app.get('/api/messages/:userId', async (req, res) => {
   }
 });
 
-// Serve the Svelte application
 app.get('/api/loggedInUserId', async (req, res) => {
   try {
-    // Fetch the user from the database based on req.user (assuming it's populated after authentication)
     const user = await User.findById(req.user._id);
     if (!user) {
-      throw new Error('User not found'); // Handle the case where user is not found
+      throw new Error('User not found');
     }
-    console.log(user + "this is the user")
-    // Send the user ID to the client-side
+    console.log(user + "this is the user");
     res.json({ loggedInUserId: user._id });
   } catch (error) {
     console.error('Error fetching user:', error);
@@ -207,9 +228,6 @@ app.get('/api/loggedInUserId', async (req, res) => {
   }
 });
 
-
-
-
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
