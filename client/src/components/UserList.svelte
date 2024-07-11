@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { formatDistanceToNow, parseISO, format } from 'date-fns';
 
   // Define props and variables
   export let selectedUsers = [];
@@ -22,6 +23,20 @@
     }
     return message;
   }
+
+  // Function to format the message timestamp
+  function formatTimestamp(timestamp) {
+    const date = parseISO(timestamp);
+    const now = new Date();
+    const diffInMs = now - date;
+    const diffInHours = diffInMs / 1000 / 60 / 60;
+
+    if (diffInHours < 24) {
+      return formatDistanceToNow(date, { addSuffix: true });
+    } else {
+      return format(date, 'MMM dd');
+    }
+  }
 </script>
 
 <style>
@@ -40,9 +55,15 @@
       <img src="/user-img.png" alt={user.username} class="rounded-circle" style="width: 40px; height: 40px;">
     </div>
     <div>
-      <span class="d-block" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 700; font-size: 15px; line-height: 20px; color: #e7e9ea;">@{user.username}</span>
+      <div>
+        <span class="d-block" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 700; font-size: 15px; line-height: 20px; color: #e7e9ea;">@{user.username}</span>
+      </div>
+      
       <span class="d-block" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 400; font-size: 15px; line-height: 20px; color: #71767b;">
         {truncateMessage(user.lastMessage || 'No messages yet', 30)}
+      </span>
+      <span class="d-block" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 400; font-size: 15px; line-height: 20px; color: #71767b;">
+        {user.lastMessageTimestamp ? formatTimestamp(user.lastMessageTimestamp) : ''}
       </span>
     </div>
   </div>
