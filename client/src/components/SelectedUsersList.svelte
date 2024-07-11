@@ -121,6 +121,13 @@
   });
 </script>
 
+<style>
+  #selected-users {
+    max-height: 70vh; 
+    overflow-y: auto;
+  }
+</style>
+
 <div id="selected-users">
   <DirectMessageSearch on:focus={handleFocus} on:back={handleBack}/>
   
