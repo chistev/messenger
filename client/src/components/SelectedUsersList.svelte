@@ -72,7 +72,7 @@
       fetchSelectedUsers();
     } else if (data.content && data.sender) {
       console.log("Chat message received:", data);
-      updateSelectedUsersOnMessage(data.sender);
+      updateSelectedUsersOnMessage(data.sender, data.content);
       fetchSelectedUsers();
     } else {
       console.warn("Unknown message received from WebSocket:", data);
@@ -94,11 +94,12 @@
     }
   }
 
-  function updateSelectedUsersOnMessage(senderId) {
+  function updateSelectedUsersOnMessage(senderId, message) {
     console.log('Updating selected users on message from:', senderId);
     console.log('Current selected users:', JSON.stringify(selectedUsers, null, 2));
     const index = selectedUsers.findIndex(user => user._id === senderId);
     if (index !== -1) {
+      selectedUsers[index].lastMessage = message; // Update last message
       const user = selectedUsers.splice(index, 1)[0];
       selectedUsers = [user, ...selectedUsers];
       console.log('Updated selected users order:', JSON.stringify(selectedUsers, null, 2));

@@ -154,23 +154,22 @@ app.post('/api/select-user', async (req, res) => {
   }
 });
 
-// Route to fetch selected users with last message timestamp
+// Route to fetch selected users with last message content and timestamp
 app.get('/api/selected-users', async (req, res) => {
   try {
     const loggedInUserId = req.user._id; // Assuming user is authenticated and user ID is available
     console.log(`Fetching selected users for logged in user ID: ${loggedInUserId}`);
 
-    // Fetch the logged in user and populate selectedUsers
+    // Fetch the logged-in user and populate selectedUsers
     const user = await User.findById(loggedInUserId).populate('selectedUsers');
     if (!user) {
       console.log(`User not found with ID: ${loggedInUserId}`);
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Calculate last message timestamps for each selected user
-    const selectedUsersWithTimestamp = await Promise.all(
+    // Fetch last message content and timestamp for each selected user
+    const selectedUsersWithLastMessage = await Promise.all(
       user.selectedUsers.map(async (selectedUser) => {
-        // Find the last message either sent or received by the logged in user and the selected user
         const lastMessage = await Message.findOne({
           $or: [
             { sender: loggedInUserId, recipient: selectedUser._id },
@@ -178,25 +177,26 @@ app.get('/api/selected-users', async (req, res) => {
           ]
         }).sort({ timestamp: -1 });
 
-        console.log(`Selected user: ${selectedUser._id}, Last message timestamp: ${lastMessage ? lastMessage.timestamp : 'No message found'}`);
+        console.log(`Selected user: ${selectedUser._id}, Last message: ${lastMessage ? lastMessage.content : 'No message found'}`);
 
         return {
           ...selectedUser.toObject(),
+          lastMessage: lastMessage ? lastMessage.content : 'No messages yet',
           lastMessageTimestamp: lastMessage ? lastMessage.timestamp : null
         };
       })
     );
 
     // Sort selected users by lastMessageTimestamp in descending order
-    selectedUsersWithTimestamp.sort((a, b) => {
+    selectedUsersWithLastMessage.sort((a, b) => {
       if (!a.lastMessageTimestamp) return 1; // Move users with no messages to the end
       if (!b.lastMessageTimestamp) return -1; // Move users with no messages to the end
       return b.lastMessageTimestamp - a.lastMessageTimestamp;
     });
 
-    console.log('Selected users with last message timestamps:', selectedUsersWithTimestamp);
+    console.log('Selected users with last message:', selectedUsersWithLastMessage);
 
-    res.json({ selectedUsers: selectedUsersWithTimestamp });
+    res.json({ selectedUsers: selectedUsersWithLastMessage });
   } catch (err) {
     console.error('Error fetching selected users:', err);
     res.status(500).json({ message: 'Server error' });
