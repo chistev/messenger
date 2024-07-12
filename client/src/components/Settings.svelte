@@ -1,138 +1,72 @@
 <script>
     import { createEventDispatcher } from 'svelte';
+    import { onMount } from 'svelte';
 
     const dispatch = createEventDispatcher();
 
     function handleBackClick() {
         dispatch('closeSettings');
     }
+
+    async function handleSignOut() {
+        try {
+            const response = await fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include' // Include cookies in the request
+            });
+
+            if (response.ok) {
+                // Redirect to the sign-in page
+                window.location.href = '/signin';
+            } else {
+                // Handle error response from the server
+                console.error('Failed to log out');
+            }
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+    }
 </script>
 
 <style>
-    /* Logout */
-    .sign-in-btn {
-        transition: background-color 0.3s, color 0.3s;
-    }
-  
-    .sign-in-btn:hover {
-        background-color: rgba(29, 155, 240, 0.1);
-    }
-  
-    /* Select Username */
-    .submit-button {
-        background-color: transparent;
-        color: white;
-        padding: 10px 20px;
-        border: 1px solid #ccc;
-        border-radius: 50px;
-        cursor: pointer;
-        width: 80%;
-        transition: background-color 0.3s ease;
-    }
-  
-    .submit-button:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-  
-    .input-error {
-        border-color: #f4212e !important;
-    }
-  
     /* Messages */
     .border-right {
         border-right: 1px solid #2f3336;
         border-left: 1px solid #2f3336;
     }
-  
-    .form-control::placeholder {
-        color: #e7e9ea;
-        opacity: 1;
-        font-weight: bold;
-    }
-  
-    .direct-search-input-container {
+
+    .header {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        border: 1px solid #35363a;
-        border-radius: 25px;
-        padding: 5px 15px;
-        width: 100%;
     }
-  
-    .direct-search-input {
-        background: transparent;
-        border: none;
-        color: #e7e9ea;
-        flex-grow: 1;
-        outline: none;
-    }
-  
-    .direct-search-input:focus {
-        background: transparent;
-        box-shadow: none;
-        color: #e7e9ea;;
-    }
-  
-    .direct-search-input::placeholder {
-        color: #71767b;
-        font-weight: 100;
-    }
-  
-    .three-dots-icon-container {
+
+    .back-icon {
         cursor: pointer;
     }
-  
-    .user-container .three-dots-icon-container {
-        display: none;
+
+    .sign-out-button {
+        background-color: #ff4b5c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
     }
-  
-    .user-container:hover .three-dots-icon-container {
-        display: block;
+
+    .sign-out-button:hover {
+        background-color: #ff1f3b;
     }
-  
-    .three-dots-custom-modal-dialog {
-        max-width: fit-content;
-        margin: auto;
-    }
-  
-    .custom-popover {
-        background-color: #202327;
-        color: #e7e9ea;
-        border-radius: 0.5rem;
-    }
-  
-    .custom-popover .popover-arrow::before {
-        background-color: #202327;
-    }
-  
-    .custom-popover .custom-popover-content {
-        color: #e7e9ea;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-        font-weight: 700; 
-        font-size: 15px; 
-        line-height: 20px; 
-        color: #e7e9ea;
-    }
-  </style>
+</style>
 
 <div class="col-md-8 border-right">
     <div class="p-3">
-        <div class="d-flex">
-            <div>
-                <i class="bi bi-arrow-left fs-4" id="back-icon" style="cursor: pointer;" on:click={handleBackClick}></i>
-            </div>
-            <div>
-                <h3 class="mb-5 ms-5">Direct Messages</h3>
-            </div>
+        <div class="header">
+            <i class="bi bi-arrow-left fs-4 back-icon text-white" id="back-icon" on:click={handleBackClick}></i>
+            <button class="sign-out-button" on:click={handleSignOut}>Sign Out</button>
         </div>
-        <div class="d-flex align-items-center justify-content-between">
-            <div>
-                <div>Show read receipts</div>
-            </div>
-            <div>
-                <input type="checkbox" name="read-receipts" value="read-receipts">
-            </div>
-        </div>
-        <div>Let people you’re messaging with know when you’ve seen their messages.</div>
     </div>
 </div>
