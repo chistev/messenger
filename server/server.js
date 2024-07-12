@@ -15,9 +15,6 @@ const Message = require('./models/Message');
 // Load environment variables from .env file
 dotenv.config();
 
-// Set EJS as the view engine
-app.set('view engine', 'ejs');
-
 // Connect to MongoDB
 const connectDB = require('./config/mongoose');
 connectDB();
@@ -63,18 +60,7 @@ wss.on('connection', (ws) => {
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// Configure express-session middleware
-app.use(session({
-  secret: process.env.SECRET, 
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
-    collectionName: 'sessions'
-  }),
-  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 1 day in milliseconds
-}));
+app.use(require('./middleware/session')(passport));
 
 // Passport configuration
 app.use(passport.initialize());
@@ -85,11 +71,9 @@ app.get('/', (req, res) => {
   res.redirect(`http://localhost:${clientport}/`);
 });
 
-const authRoutes = require('./controllers/authControllers/authRoutes');
-const usernameRoutes = require('./controllers/authControllers/usernameRoutes');
-
-app.use('/', authRoutes);
-app.use('/', usernameRoutes);
+app.use('/', require('./controllers/authControllers/authRoutes'));
+app.use('/', require('./controllers/authControllers/usernameRoutes'));
+app.use('/api/users', require('./controllers/users'));
 
 // Serve static files from the 'client/public' folder (where Svelte outputs files)
 app.use(express.static(path.join(__dirname, '../client/static')));
@@ -97,33 +81,6 @@ app.use(express.static(path.join(__dirname, '../client/static')));
 // Serve the Svelte application
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/src'));
-});
-
-app.get('/api/users', async (req, res) => {
-  const { username } = req.query;
-  const currentUserUsername = req.user.username; 
-
-   try {
-    const currentUser = await User.findOne({ username: currentUserUsername });
-
-    if (!currentUser) {
-      return res.status(404).send('Current user not found');
-    }
-
-    const selectedUserIds = currentUser.selectedUsers.map(user => user._id);
-    console.log('Selected users to exclude:', selectedUserIds);
-
-    const users = await User.find({ 
-      username: new RegExp(username, 'i'), 
-      username: { $ne: currentUserUsername },
-      _id: { $nin: selectedUserIds }
-    }).limit(10);
-
-    res.json(users);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server Error');
-  }
 });
 
 app.post('/api/select-user', async (req, res) => {

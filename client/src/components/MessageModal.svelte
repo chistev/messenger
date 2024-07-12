@@ -49,6 +49,10 @@
       users = [];
     }
   }
+
+  function handleSelectUser(selectedUser) {
+    dispatch('selectUser', selectedUser); // Propagate selectUser event to parent component
+  }
 </script>
 
 <div class={`modal fade ${showModal ? 'show' : ''}`} id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden={!showModal}>
@@ -75,7 +79,7 @@
         </div>
         <hr>
         <div id="user-results">
-          <RetrievedUsers {users} />
+          <RetrievedUsers {users} on:selectUser={handleSelectUser}/>
         </div>
       </div>
     </div>

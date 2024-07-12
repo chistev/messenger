@@ -35,6 +35,12 @@
     function handleUserSelection(event) {
         currentChatUser = event.detail;
     }
+
+    // Listen for selectUser event from MessageModal to update selectedUsers and currentChatUser
+  function handleSelectUser(event) {
+    selectedUsers = [...selectedUsers, event.detail];
+    currentChatUser = event.detail;
+  }
   
     onMount(async () => {
         try {
@@ -98,6 +104,6 @@
             {/if}
         </div>
     </div>
-    <MessageModal showModal={showMessageModal} on:closeModal={closeMessageModal} />
+    <MessageModal showModal={showMessageModal} on:closeModal={closeMessageModal} on:selectUser={handleSelectUser}/>
   </div>
   
