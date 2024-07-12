@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
-const User = require('./models/User'); // Adjust the path if needed
-const Message = require('./models/Message'); // Adjust the path if needed
+const User = require('./models/User'); 
+const Message = require('./models/Message'); 
+const dotenv = require('dotenv');
 
-// Replace with your MongoDB URI
-const mongoURI = '';
+dotenv.config();
+
+const mongoURI = process.env.MONGODB_URI;
 
 async function clearDatabase() {
   try {
