@@ -20,7 +20,7 @@ router.get('/auth/google/callback',
       if (req.user.username) {
         res.redirect('/');
       } else {
-        res.redirect('/select-username');
+        res.redirect('http://localhost:5173/select');
       }
     } else {
       res.redirect('/login');

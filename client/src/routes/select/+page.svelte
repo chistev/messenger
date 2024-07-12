@@ -91,31 +91,75 @@
 
 <style>
     body {
-        background-color: #242d34;
-    }
-    .card {
         background-color: #000000;
-        color: white;
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .card {
+        background-color: #1f1f1f;
         padding: 20px;
         border-radius: 10px;
-        width: 90%;
-        max-width: 600px;
-        text-align: center;
+        width: 400px;
     }
-    .form-group {
+
+    h2 {
+        color: #ffffff;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    h3 {
+        color: #ffffff;
+        font-size: 18px;
         margin-bottom: 20px;
-        width: 80%;
     }
-    .input-error {
-        border-color: red;
+
+    .form-group {
+        position: relative;
+        margin: 0 auto;
+        width: 100%;
     }
+
+    .form-group input {
+        background-color: #333333;
+        border: none;
+        border-radius: 5px;
+        color: #ffffff;
+        font-size: 16px;
+        padding: 10px 15px;
+        width: calc(100% - 30px);
+        margin-left: 30px;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .available-message {
+        color: green;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
     .submit-button {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    .submit-button.enabled {
-        opacity: 1;
+        background-color: #4CAF50;
+        border: none;
+        border-radius: 5px;
+        color: #ffffff;
         cursor: pointer;
+        font-size: 16px;
+        padding: 10px 20px;
+        margin-top: 20px;
+    }
+
+    .submit-button:disabled {
+        background-color: #888888;
+        cursor: not-allowed;
     }
 </style>
 
@@ -130,12 +174,12 @@
                 <input type="text" id="username" name="username" bind:value={username} placeholder="Username" on:input={handleInput} required>
             </div>
             {#if errorMessage}
-                <div class="error-message" style="color: red; font-size: 12px;">{errorMessage}</div>
+                <div class="error-message">{errorMessage}</div>
             {/if}
             {#if successMessage}
-                <div class="available-message" style="color: green; font-size: 12px;">{successMessage}</div>
+                <div class="available-message">{successMessage}</div>
             {/if}
-            <button class="submit-button mt-5" class:enabled={!formDisabled} type="submit" {disabled}>Next</button>
+            <button class="submit-button mt-5" class:enabled={!formDisabled} type="submit">Next</button>
         </form>
     </div>
 </body>

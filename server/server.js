@@ -15,6 +15,9 @@ const Message = require('./models/Message');
 // Load environment variables from .env file
 dotenv.config();
 
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+
 // Connect to MongoDB
 const connectDB = require('./config/mongoose');
 connectDB();
