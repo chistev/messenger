@@ -75,6 +75,7 @@ app.get('/', (req, res) => {
 app.use('/', require('./controllers/authControllers/authRoutes'));
 app.use('/', require('./controllers/authControllers/usernameRoutes'));
 app.use('/api/users', require('./controllers/users'));
+app.use('/api/messages', require('./controllers/messageController'));
 
 
 // Serve static files from the 'client/public' folder (where Svelte outputs files)
@@ -99,49 +100,6 @@ app.get('/api/users/:userid', async (req, res) => {
     res.send(user);
   } catch (error) {
     res.status(500).send({ message: 'Server error' });
-  }
-});
-
-app.post('/api/messages/:userId', async (req, res) => {
-  const { userId } = req.params;
-  const { content, type } = req.body;
-
-  const message = new Message({
-    content,
-    type,
-    sender: req.user._id,
-    recipient: userId
-  });
-
-  try {
-    const savedMessage = await message.save();
-    console.log(`Message saved - Sender: ${req.user._id}, Recipient: ${userId}, Timestamp: ${savedMessage.timestamp}`);
-    
-    // Broadcast the saved message to all connected clients
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(savedMessage));
-      }
-    });
-
-    res.status(200).json(savedMessage);
-  } catch (err) {
-    console.error('Error saving message:', err);
-    res.status(500).json({ error: 'Failed to save message' });
-  }
-});
-
-app.get('/api/messages/:userId', async (req, res) => {
-  const { userId } = req.params;
-
-  try {
-    const messages = await Message.find({ $or: [{ sender: userId }, { recipient: userId }] })
-                                  .sort({ timestamp: 1 });
-    console.log(`Messages fetched for User ID: ${userId}`, messages);
-    res.status(200).json({ messages });
-  } catch (err) {
-    console.error('Error fetching messages:', err);
-    res.status(500).json({ error: 'Failed to fetch messages' });
   }
 });
 
