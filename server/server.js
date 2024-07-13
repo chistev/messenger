@@ -76,6 +76,8 @@ app.use('/', require('./controllers/authControllers/authRoutes'));
 app.use('/', require('./controllers/authControllers/usernameRoutes'));
 app.use('/api/users', require('./controllers/users'));
 app.use('/api/messages', require('./controllers/messageController'));
+app.use('/api/select-user', selectUser.selectUser);
+app.use('/api/selected-users', require('./controllers/selectedUsers'));
 
 
 // Serve static files from the 'client/public' folder (where Svelte outputs files)
@@ -86,12 +88,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/src'));
 });
 
-app.post('/api/select-user', selectUser.selectUser);
-
-app.get('/api/selected-users', require('./controllers/selectedUsers'));
-
 app.get('/api/users/:userid', async (req, res) => {
-  console.log("route hit")
   try {
     const user = await User.findById(req.params.userid);
     if (!user) {

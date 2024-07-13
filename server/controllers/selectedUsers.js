@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Message = require('../models/Message');
 
-router.get('/selected-users', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
     console.log(`Fetching selected users for logged in user ID: ${loggedInUserId}`);

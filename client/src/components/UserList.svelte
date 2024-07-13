@@ -60,7 +60,7 @@
       </div>
       
       <span class="d-block" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 400; font-size: 15px; line-height: 20px; color: #71767b;">
-        {truncateMessage(user.lastMessage || 'No messages yet', 30)}
+        {truncateMessage(user.lastMessage || '', 30)}
       </span>
       <span class="d-block" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 400; font-size: 15px; line-height: 20px; color: #71767b;">
         {user.lastMessageTimestamp ? formatTimestamp(user.lastMessageTimestamp) : ''}

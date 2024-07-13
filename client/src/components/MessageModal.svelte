@@ -3,7 +3,7 @@
 
   import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
-	import RetrievedUsers from './RetrievedUsers.svelte';
+  import RetrievedUsers from './RetrievedUsers.svelte';
 
   const dispatch = createEventDispatcher();
   let inputRef;
@@ -50,8 +50,9 @@
     }
   }
 
-  function handleSelectUser(selectedUser) {
-    dispatch('selectUser', selectedUser); // Propagate selectUser event to parent component
+  function handleSelectUser(event) {
+    const selectedUser = event.detail;
+    dispatch('selectUser', selectedUser); // Propagate selectUser event with full user object
   }
 </script>
 

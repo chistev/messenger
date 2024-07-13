@@ -1,45 +1,48 @@
 <script>
-    import { onMount } from 'svelte';
-    import { createEventDispatcher } from 'svelte';
-    
-    export let users = [];
-    
-    const dispatch = createEventDispatcher();
-    
-    async function selectUser(selectedUserId) {
-      try {
-        const response = await fetch('/api/select-user', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            selectedUserId: selectedUserId,
-          }),
-        });
+  import { createEventDispatcher } from 'svelte';
   
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+  export let users = [];
   
-        const data = await response.json();
-        console.log('Successfully selected user:', data);
-        dispatch('selectUser', selectedUserId); // Emit event to notify parent
-      } catch (error) {
-        console.error('Error selecting user:', error);
-        // Handle error condition
+  const dispatch = createEventDispatcher();
+  
+  async function selectUser(selectedUser) {
+    try {
+      console.log('selectUser function called with selectedUser:', selectedUser);
+
+      const response = await fetch('/api/select-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          selectedUserId: selectedUser._id,
+        }),
+      });
+
+      console.log('Response received from /api/select-user:', response);
+
+      if (!response.ok) {
+        console.error('Network response was not ok:', response.status, response.statusText);
+        throw new Error('Network response was not ok');
       }
+
+      const data = await response.json();
+      console.log('Successfully selected user:', data);
+      dispatch('selectUser', selectedUser); // Emit event with full user object
+    } catch (error) {
+      console.error('Error selecting user:', error);
+      // Handle error condition
     }
-  </script>
-  
-  {#each users as user}
-    <div class="user-result d-flex align-items-center mb-3">
-      <a href="#" class="me-3 user-link" data-username={user.username} data-user-id={user._id} on:click={() => selectUser(user._id)}>
-        <img src="" alt={user.username} class="rounded-circle" style="width: 40px; height: 40px;">
-      </a>
-      <a href="#" class="text-decoration-none text-white user-link" data-username={user.username} data-user-id={user._id} on:click={() => selectUser(user._id)}>
-        <span class="d-block">{user.username}</span>
-      </a>
-    </div>
-  {/each}
-  
+  }
+</script>
+
+{#each users as user}
+  <div class="user-result d-flex align-items-center mb-3">
+    <a href="#" class="me-3 user-link" data-username={user.username} data-user-id={user._id} on:click={() => selectUser(user)}>
+      <img src="/user-img.png" alt={user.username} class="rounded-circle" style="width: 40px; height: 40px;">
+    </a>
+    <a href="#" class="text-decoration-none text-white user-link" data-username={user.username} data-user-id={user._id} on:click={() => selectUser(user)}>
+      <span class="d-block">{user.username}</span>
+    </a>
+  </div>
+{/each}
