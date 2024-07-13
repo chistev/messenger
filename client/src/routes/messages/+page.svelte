@@ -7,17 +7,17 @@
     import ChatPanel from '../../components/ChatPanel.svelte';
     import SelectMessage from '../../components/SelectMessage.svelte';
     import { onMount } from 'svelte';
-  
+
     let showSettings = false;
     let showMessageModal = false;
     let selectedUsers = [];
     let loading = true;
     let currentChatUser = null;
-  
+
     function toggleSettings() {
         showSettings = !showSettings;
     }
-  
+
     function toggleMessageModal() {
         showMessageModal = !showMessageModal;
         if (showMessageModal) {
@@ -26,30 +26,40 @@
             document.querySelector('.page-container').style.backgroundColor = '#000000';
         }
     }
-  
+
     function closeMessageModal() {
         showMessageModal = false;
         document.querySelector('.page-container').style.backgroundColor = '#000000';
     }
-  
+
     function handleUserSelection(event) {
         currentChatUser = event.detail;
     }
 
     // Listen for selectUser event from MessageModal to update selectedUsers and currentChatUser
-  function handleSelectUser(event) {
-    selectedUsers = [...selectedUsers, event.detail];
-    currentChatUser = event.detail;
-  }
-  
+    function handleSelectUser(event) {
+        selectedUsers = [...selectedUsers, event.detail];
+        currentChatUser = event.detail;
+    }
+
     onMount(async () => {
         try {
+            const authResponse = await fetch('/api/loggedInUserId', {
+                credentials: 'include'
+            });
+
+            if (!authResponse.ok) {
+                // If response is not ok, redirect to login page
+                window.location.href = '/signin';
+                return;
+            }
+
             const response = await fetch('/api/selected-users', {
                 credentials: 'include'
             });
             const data = await response.json();
             selectedUsers = data.selectedUsers;
-  
+
             // Check URL to load appropriate user on mount
             const userId = window.location.pathname.split('/').pop();
             if (userId && selectedUsers.some(user => user._id === userId)) {
@@ -61,8 +71,8 @@
             loading = false;
         }
     });
-  </script>
-  
+</script>
+
   <style>
     .border-right {
         border-right: 1px solid #2f3336;

@@ -12,6 +12,7 @@ const clientport = 5173;
 const User = require('./models/User');
 const Message = require('./models/Message');
 const selectUser = require('./controllers/selectUser');
+const authMiddleware = require('./middleware/auth');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -77,6 +78,10 @@ app.use('/', require('./controllers/authControllers/usernameRoutes'));
 app.use('/api/users', require('./controllers/users'));
 app.use('/api/messages', require('./controllers/messageController'));
 
+// Protect the messages page
+app.get('/messages', authMiddleware, (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/src'));
+});
 
 // Serve static files from the 'client/public' folder (where Svelte outputs files)
 app.use(express.static(path.join(__dirname, '../client/static')));
