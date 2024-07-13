@@ -1,6 +1,5 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { onMount } from 'svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -15,14 +14,12 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                credentials: 'include' // Include cookies in the request
+                credentials: 'include' // Include credentials such as cookies and authorization headers in the request
             });
 
             if (response.ok) {
-                // Redirect to the sign-in page
                 window.location.href = '/signin';
             } else {
-                // Handle error response from the server
                 console.error('Failed to log out');
             }
         } catch (error) {
@@ -32,7 +29,6 @@
 </script>
 
 <style>
-    /* Messages */
     .border-right {
         border-right: 1px solid #2f3336;
         border-left: 1px solid #2f3336;
@@ -46,6 +42,16 @@
 
     .back-icon {
         cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: inherit;
+        color: inherit;
+        transition: transform 0.2s ease-in-out; /* Added transition for smooth hover effect */
+    }
+
+    .back-icon:hover {
+        transform: scale(1.1); /* Example: Scale up the icon on hover */
     }
 
     .sign-out-button {
@@ -65,7 +71,13 @@
 <div class="col-md-8 border-right">
     <div class="p-3">
         <div class="header">
-            <i class="bi bi-arrow-left fs-4 back-icon text-white" id="back-icon" on:click={handleBackClick}></i>
+            <button 
+                class="back-icon" 
+                aria-label="Go back"
+                on:click={handleBackClick}
+                on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleBackClick()}>
+                <i class="bi bi-arrow-left fs-4 text-white"></i>
+            </button>
             <button class="sign-out-button" on:click={handleSignOut}>Sign Out</button>
         </div>
     </div>

@@ -78,6 +78,17 @@
         border-right: 1px solid #2f3336;
         border-left: 1px solid #2f3336;
     }
+
+    .fs-6 button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: inherit;
+    }
+
+    .fs-6 button:focus {
+        outline: none;
+    }
   </style>
   
   <div class="page-container" style="background-color: #000000;">
@@ -90,8 +101,13 @@
                             Messages
                         </h3>
                         <div class="fs-6 text-white">
-                            <i style="cursor: pointer;" class="bi bi-gear me-3" on:click={toggleSettings} aria-label="Toggle Settings"></i>
-                            <i class="bi bi-envelope-at" style="cursor: pointer;" on:click={toggleMessageModal} aria-label="Open Message Modal"></i>
+                            <button type="button" aria-label="Toggle Settings" on:click={toggleSettings}>
+                                <i class="bi bi-gear me-3" style="cursor: pointer;"></i>
+                            </button>
+
+                            <button type="button" aria-label="Open Message Modal" on:click={toggleMessageModal}>
+                                <i class="bi bi-envelope-at" style="cursor: pointer;"></i>
+                            </button>
                         </div>
                     </div>
                     {#if loading}
