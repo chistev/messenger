@@ -52,7 +52,7 @@
 
   function handleSelectUser(event) {
     const selectedUser = event.detail;
-    dispatch('selectUser', selectedUser); // Propagate selectUser event with full user object
+    dispatch('selectUser', selectedUser);
   }
 </script>
 
