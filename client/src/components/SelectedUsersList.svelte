@@ -1,7 +1,5 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte';
-  import DirectMessageSearch from './DirectMessageSearch.svelte';
-  import DefaultDirectMessageText from './DefaultDirectMessageText.svelte';
   import UserList from './UserList.svelte';
 
   export let selectedUsers = [];
@@ -129,11 +127,7 @@
 </style>
 
 <div id="selected-users">
-  <DirectMessageSearch on:focus={handleFocus} on:back={handleBack}/>
   
-  {#if isInputFocused}
-    <DefaultDirectMessageText/>
-  {:else}
+  
     <UserList {selectedUsers} {currentSelectedUser} on:selectUser={selectUser}/>
-  {/if}
 </div>
