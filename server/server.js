@@ -29,11 +29,7 @@ const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws) => {
-  console.log('WebSocket client connected');
-
   ws.on('message', (message) => {
-    console.log(`Received message => ${message}`);
-
     // Attempt to parse the received message
     try {
       const parsedMessage = JSON.parse(message);
@@ -46,7 +42,6 @@ wss.on('connection', (ws) => {
     wss.clients.forEach((client) => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(message);
-        console.log(`Sent message => ${message}`);
       }
     });
   });
@@ -109,7 +104,6 @@ app.get('/api/loggedInUserId', async (req, res) => {
     if (!user) {
       throw new Error('User not found');
     }
-    console.log(user + "this is the user");
     res.json({ loggedInUserId: user._id });
   } catch (error) {
     console.error('Error fetching user:', error);

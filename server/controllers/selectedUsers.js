@@ -6,11 +6,9 @@ const Message = require('../models/Message');
 router.get('/', async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
-    console.log(`Fetching selected users for logged in user ID: ${loggedInUserId}`);
 
     const user = await User.findById(loggedInUserId).populate('selectedUsers');
     if (!user) {
-      console.log(`User not found with ID: ${loggedInUserId}`);
       return res.status(404).json({ message: 'User not found' });
     }
 
@@ -22,8 +20,6 @@ router.get('/', async (req, res) => {
             { sender: selectedUser._id, recipient: loggedInUserId }
           ]
         }).sort({ timestamp: -1 });
-
-        console.log(`Selected user: ${selectedUser._id}, Last message: ${lastMessage ? lastMessage.content : 'No message found'}`);
 
         return {
           ...selectedUser.toObject(),
@@ -38,8 +34,6 @@ router.get('/', async (req, res) => {
       if (!b.lastMessageTimestamp) return -1;
       return b.lastMessageTimestamp - a.lastMessageTimestamp;
     });
-
-    console.log('Selected users with last message:', selectedUsersWithLastMessage);
 
     res.json({ selectedUsers: selectedUsersWithLastMessage });
   } catch (err) {

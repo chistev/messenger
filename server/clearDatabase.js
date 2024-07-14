@@ -12,11 +12,9 @@ async function clearDatabase() {
     await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
     console.log('Connected to MongoDB');
 
-    // Clear User collection
     await User.deleteMany({});
     console.log('User collection cleared');
 
-    // Clear Message collection
     await Message.deleteMany({});
     console.log('Message collection cleared');
 

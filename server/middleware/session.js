@@ -10,6 +10,6 @@ module.exports = (passport) => {
       mongoUrl: process.env.MONGODB_URI,
       collectionName: 'sessions'
     }),
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 1 day in milliseconds
+    cookie: { maxAge: 24 * 60 * 60 * 1000 } 
   });
 };

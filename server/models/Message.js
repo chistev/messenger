@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Define the Message schema
 const MessageSchema = new mongoose.Schema({
   content: {
     type: String,
@@ -28,8 +27,6 @@ const MessageSchema = new mongoose.Schema({
   }
 });
 
-// Create a model based on the schema
 const Message = mongoose.model('Message', MessageSchema);
 
-// Export the model
 module.exports = Message;
