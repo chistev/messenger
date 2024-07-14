@@ -47,11 +47,11 @@
         padding: 0;
         font-size: inherit;
         color: inherit;
-        transition: transform 0.2s ease-in-out; /* Added transition for smooth hover effect */
+        transition: transform 0.2s ease-in-out; 
     }
 
     .back-icon:hover {
-        transform: scale(1.1); /* Example: Scale up the icon on hover */
+        transform: scale(1.1); 
     }
 
     .sign-out-button {
