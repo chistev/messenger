@@ -84,48 +84,74 @@
   }
 
   onMount(() => {
-  fetchMessages();
-  fetchLoggedInUserId();
+    fetchMessages();
+    fetchLoggedInUserId();
 
-  console.log("Attempting to connect to WebSocket server...");
-  socket = new WebSocket('ws://localhost:3000');
+    console.log("Attempting to connect to WebSocket server...");
+    socket = new WebSocket('ws://localhost:3000');
 
-  socket.onopen = () => {
-    console.log("WebSocket connection established");
-  };
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
 
-  socket.onmessage = (event) => {
-    console.log("Message received from WebSocket:", event.data);
+    socket.onmessage = (event) => {
+      console.log("Message received from WebSocket:", event.data);
 
-    try {
-      let receivedMessage = JSON.parse(event.data);
-      receivedMessage.timestamp = new Date(receivedMessage.timestamp);
+      if (event.data instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const receivedMessage = JSON.parse(reader.result);
+            receivedMessage.timestamp = new Date(receivedMessage.timestamp);
 
-      const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
+            const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
 
-      if (
-        receivedMessage.recipient === loggedInUserId &&
-        receivedMessage.sender === currentChatUser._id && // Ensure message is from the current chat user
-        !isDuplicate
-      ) {
-        messages = [...messages, receivedMessage];
-        console.log('Parsed received message:', receivedMessage);
+            if (
+              receivedMessage.recipient === loggedInUserId &&
+              receivedMessage.sender === currentChatUser._id && // Ensure message is from the current chat user
+              !isDuplicate
+            ) {
+              messages = [...messages, receivedMessage];
+              console.log('Parsed received message:', receivedMessage);
+            } else {
+              console.log('Duplicate message received or not intended for the current user.');
+            }
+          } catch (error) {
+            console.error('Error parsing JSON from WebSocket message:', error);
+          }
+        };
+        reader.readAsText(event.data);
       } else {
-        console.log('Duplicate message received or not intended for the current user.');
+        try {
+          const receivedMessage = JSON.parse(event.data);
+          receivedMessage.timestamp = new Date(receivedMessage.timestamp);
+
+          const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
+
+          if (
+            receivedMessage.recipient === loggedInUserId &&
+            receivedMessage.sender === currentChatUser._id && // Ensure message is from the current chat user
+            !isDuplicate
+          ) {
+            messages = [...messages, receivedMessage];
+            console.log('Parsed received message:', receivedMessage);
+          } else {
+            console.log('Duplicate message received or not intended for the current user.');
+          }
+        } catch (error) {
+          console.error('Error parsing JSON from WebSocket message:', error);
+        }
       }
-    } catch (error) {
-      console.error('Error parsing JSON from WebSocket message:', error);
-    }
-  };
+    };
 
-  socket.onerror = (error) => {
-    console.error("WebSocket error:", error);
-  };
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
 
-  socket.onclose = (event) => {
-    console.log("WebSocket connection closed:", event);
-  };
-});
+    socket.onclose = (event) => {
+      console.log("WebSocket connection closed:", event);
+    };
+  });
 
   beforeUpdate(() => {
     if (currentChatUser._id !== previousUserId) {
