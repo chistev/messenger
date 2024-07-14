@@ -1,14 +1,43 @@
+<!-- select/+page.svelte -->
+
 <script>
     import { onMount } from 'svelte';
     import { createEventDispatcher } from 'svelte';
-    
+
     let username = '';
     let csrfToken = ''; // You should set this based on your authentication mechanism
     let errorMessage = '';
     let successMessage = '';
     let formDisabled = true;
+    let userExists = false; // New state to store if user exists
 
     const dispatcher = createEventDispatcher();
+
+    const checkUserStatus = async () => {
+        try {
+            const response = await fetch('/api/check-new-user');
+            if (response.status === 401) {
+                // Redirect user to logout or login page
+                window.location.href = '/signin'; // Replace with your logout route
+                return;
+            }
+            const data = await response.json();
+            userExists = data.exists;
+            if (userExists) {
+                // Redirect user to messages page if username already exists
+                window.location.href = '/messages'; // Replace with your messages route
+                return;
+            } else {
+                errorMessage = '';
+                successMessage = '';
+                formDisabled = false;
+            }
+        } catch (error) {
+            console.error('Error checking user status:', error);
+        }
+    };
+
+    onMount(checkUserStatus); // Call checkUserStatus when component mounts
 
     const checkUsernameAvailability = async (username) => {
         try {
@@ -81,7 +110,7 @@
                 formDisabled = true;
             } else {
                 // Success case, redirect or proceed accordingly
-                dispatcher('redirect', { location: '/' });
+                window.location.href = '/messages'; // Redirect to messages page
             }
         } catch (error) {
             console.error('Error submitting form:', error);
@@ -161,6 +190,11 @@
         background-color: #888888;
         cursor: not-allowed;
     }
+
+    /* Gray out button when disabled */
+    .submit-button[disabled] {
+        opacity: 0.6; /* Adjust opacity to gray out the button */
+    }
 </style>
 
 <body class="d-flex flex-column align-items-center justify-content-center">
@@ -174,12 +208,12 @@
                 <input type="text" id="username" name="username" bind:value={username} placeholder="Username" on:input={handleInput} required>
             </div>
             {#if errorMessage}
-                <div class="error-message">{errorMessage}</div>
+            <div class="error-message">{errorMessage}</div>
             {/if}
             {#if successMessage}
-                <div class="available-message">{successMessage}</div>
+            <div class="available-message">{successMessage}</div>
             {/if}
-            <button class="submit-button mt-5" class:enabled={!formDisabled} type="submit">Next</button>
+            <button class="submit-button mt-5" class:enabled={!formDisabled} type="submit" disabled={formDisabled}>Next</button>
         </form>
     </div>
 </body>

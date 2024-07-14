@@ -12,6 +12,8 @@ const clientport = 5173;
 const User = require('./models/User');
 const Message = require('./models/Message');
 const selectUser = require('./controllers/selectUser');
+const checkNewUser = require('./middleware/checkNewUser'); // Adjust the path as necessary
+
 
 // Load environment variables from .env file
 dotenv.config();
@@ -78,6 +80,7 @@ app.use('/api/users', require('./controllers/users'));
 app.use('/api/messages', require('./controllers/messageController'));
 app.use('/api/select-user', selectUser.selectUser);
 app.use('/api/selected-users', require('./controllers/selectedUsers'));
+app.use('/api/check-new-user', checkNewUser);
 
 
 // Serve static files from the 'client/public' folder (where Svelte outputs files)
