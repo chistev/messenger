@@ -1,15 +1,13 @@
-<!-- select/+page.svelte -->
-
 <script>
     import { onMount } from 'svelte';
     import { createEventDispatcher } from 'svelte';
 
     let username = '';
-    let csrfToken = ''; // You should set this based on your authentication mechanism
+    let csrfToken = ''; 
     let errorMessage = '';
     let successMessage = '';
     let formDisabled = true;
-    let userExists = false; // New state to store if user exists
+    let userExists = false;
 
     const dispatcher = createEventDispatcher();
 
@@ -17,15 +15,13 @@
         try {
             const response = await fetch('/api/check-new-user');
             if (response.status === 401) {
-                // Redirect user to logout or login page
-                window.location.href = '/signin'; // Replace with your logout route
+                window.location.href = '/signin'; 
                 return;
             }
             const data = await response.json();
             userExists = data.exists;
             if (userExists) {
-                // Redirect user to messages page if username already exists
-                window.location.href = '/messages'; // Replace with your messages route
+                window.location.href = '/messages'; 
                 return;
             } else {
                 errorMessage = '';
@@ -37,7 +33,7 @@
         }
     };
 
-    onMount(checkUserStatus); // Call checkUserStatus when component mounts
+    onMount(checkUserStatus); 
 
     const checkUsernameAvailability = async (username) => {
         try {
@@ -109,8 +105,7 @@
                 successMessage = '';
                 formDisabled = true;
             } else {
-                // Success case, redirect or proceed accordingly
-                window.location.href = '/messages'; // Redirect to messages page
+                window.location.href = '/messages';
             }
         } catch (error) {
             console.error('Error submitting form:', error);
@@ -191,9 +186,8 @@
         cursor: not-allowed;
     }
 
-    /* Gray out button when disabled */
     .submit-button[disabled] {
-        opacity: 0.6; /* Adjust opacity to gray out the button */
+        opacity: 0.6; 
     }
 </style>
 
