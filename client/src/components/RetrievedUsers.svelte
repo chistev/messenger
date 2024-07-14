@@ -7,7 +7,6 @@
   
   async function selectUser(selectedUser) {
     try {
-      console.log('selectUser function called with selectedUser:', selectedUser);
 
       const response = await fetch('/api/select-user', {
         method: 'POST',
@@ -19,7 +18,6 @@
         }),
       });
 
-      console.log('Response received from /api/select-user:', response);
 
       if (!response.ok) {
         console.error('Network response was not ok:', response.status, response.statusText);
@@ -27,8 +25,7 @@
       }
 
       const data = await response.json();
-      console.log('Successfully selected user:', data);
-      dispatch('selectUser', selectedUser); // Emit event with full user object
+      dispatch('selectUser', selectedUser);
     } catch (error) {
       console.error('Error selecting user:', error);
       // Handle error condition
