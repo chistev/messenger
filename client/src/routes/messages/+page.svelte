@@ -36,7 +36,6 @@
         currentChatUser = event.detail;
     }
 
-    // Listen for selectUser event from MessageModal to update selectedUsers and currentChatUser
     function handleSelectUser(event) {
         selectedUsers = [...selectedUsers, event.detail];
         currentChatUser = event.detail;
@@ -49,7 +48,6 @@
             });
 
             if (!authResponse.ok) {
-                // If response is not ok, redirect to login page
                 window.location.href = '/signin';
                 return;
             }
@@ -60,7 +58,6 @@
             const data = await response.json();
             selectedUsers = data.selectedUsers;
 
-            // Check URL to load appropriate user on mount
             const userId = window.location.pathname.split('/').pop();
             if (userId && selectedUsers.some(user => user._id === userId)) {
                 currentChatUser = selectedUsers.find(user => user._id === userId);

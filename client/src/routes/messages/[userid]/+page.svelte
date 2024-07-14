@@ -33,7 +33,7 @@
     }
 
     async function fetchUserById(userId) {
-        console.log("fetchUserById called with userId", userId); // Debugging statement
+        console.log("fetchUserById called with userId", userId);
         const response = await fetch(`/api/users/${userId}`, {
             credentials: 'include'
         });
@@ -41,25 +41,24 @@
             throw new Error('Failed to fetch user');
         }
         const user = await response.json();
-        console.log("User fetched", user); // Debugging statement
+        console.log("User fetched", user);
         return user;
     }
 
     onMount(async () => {
-        const userId = window.location.pathname.split('/').pop(); // Extract userId from URL path
-        console.log("Current userId:", userId); // Debugging statement
+        const userId = window.location.pathname.split('/').pop(); 
+        console.log("Current userId:", userId);
         try {
             const response = await fetch('/api/selected-users', {
                 credentials: 'include'
             });
             const data = await response.json();
             selectedUsers = data.selectedUsers;
-            console.log("Selected users fetched", selectedUsers); // Debugging statement
+            console.log("Selected users fetched", selectedUsers); 
 
-            // Check if userId is valid and load appropriate user
             if (userId) {
                 currentChatUser = await fetchUserById(userId);
-                console.log("currentChatUser set", currentChatUser); // Debugging statement
+                console.log("currentChatUser set", currentChatUser); 
             }
         } catch (err) {
             console.error('Failed to fetch selected users:', err);
@@ -67,16 +66,23 @@
             loading = false;
         }
     });
-
-    onDestroy(() => {
-        // Cleanup if needed
-    });
 </script>
 
 <style>
     .border-right {
         border-right: 1px solid #2f3336;
         border-left: 1px solid #2f3336;
+    }
+
+    .fs-6 button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: inherit;
+    }
+
+    .fs-6 button:focus {
+        outline: none;
     }
 </style>
 
@@ -90,8 +96,13 @@
                             Messages
                         </h3>
                         <div class="fs-6 text-white">
-                            <i style="cursor: pointer;" class="bi bi-gear me-3" on:click={toggleSettings} aria-label="Toggle Settings"></i>
-                            <i class="bi bi-envelope-at" style="cursor: pointer;" on:click={toggleMessageModal} aria-label="Open Message Modal"></i>
+                            <button type="button" aria-label="Toggle Settings" on:click={toggleSettings}>
+                                <i class="bi bi-gear me-3" style="cursor: pointer;"></i>
+                            </button>
+
+                            <button type="button" aria-label="Open Message Modal" on:click={toggleMessageModal}>
+                                <i class="bi bi-envelope-at" style="cursor: pointer;"></i>
+                            </button>
                         </div>
                     </div>
                     {#if loading}
