@@ -14,22 +14,21 @@
     event.preventDefault();
     if (newMessage.trim()) {
       const message = {
-        _id: generateUniqueId(),  // Assign a unique ID to the message
+        _id: generateUniqueId(),  
         content: newMessage,
         type: "sent",
         sender: loggedInUserId,
-        recipient: currentChatUser._id,  // Include recipient ID
+        recipient: currentChatUser._id, 
         timestamp: new Date()
       };
 
       messages = [...messages, message];
 
-      console.log("Sending message through WebSocket:", message);
       socket.send(JSON.stringify(message));
 
       await saveMessage(message);
 
-      newMessage = ""; // Clear the input field after sending
+      newMessage = ""; 
     }
   }
 
@@ -95,7 +94,6 @@
     };
 
     socket.onmessage = (event) => {
-      console.log("Message received from WebSocket:", event.data);
 
       if (event.data instanceof Blob) {
         const reader = new FileReader();
@@ -108,11 +106,10 @@
 
             if (
               receivedMessage.recipient === loggedInUserId &&
-              receivedMessage.sender === currentChatUser._id && // Ensure message is from the current chat user
+              receivedMessage.sender === currentChatUser._id && 
               !isDuplicate
             ) {
               messages = [...messages, receivedMessage];
-              console.log('Parsed received message:', receivedMessage);
             } else {
               console.log('Duplicate message received or not intended for the current user.');
             }
@@ -130,11 +127,10 @@
 
           if (
             receivedMessage.recipient === loggedInUserId &&
-            receivedMessage.sender === currentChatUser._id && // Ensure message is from the current chat user
+            receivedMessage.sender === currentChatUser._id && 
             !isDuplicate
           ) {
             messages = [...messages, receivedMessage];
-            console.log('Parsed received message:', receivedMessage);
           } else {
             console.log('Duplicate message received or not intended for the current user.');
           }
@@ -155,7 +151,7 @@
 
   beforeUpdate(() => {
     if (currentChatUser._id !== previousUserId) {
-      messages = [];  // Clear messages array before fetching new messages
+      messages = [];  
       fetchMessages();
       previousUserId = currentChatUser._id;
     }
@@ -177,7 +173,7 @@
   .chat-body {
     overflow-y: auto;
     flex-grow: 1;
-    padding-bottom: 60px; /* Height of the footer */
+    padding-bottom: 60px; 
   }
 
   .chat-footer .input-container {
