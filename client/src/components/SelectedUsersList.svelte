@@ -23,16 +23,13 @@
   }
 
   onMount(() => {
-    console.log("Attempting to connect to WebSocket server...");
     socket = new WebSocket('ws://localhost:3000');
 
     socket.onopen = () => {
-      console.log("WebSocket connection established");
       fetchSelectedUsers();
     };
 
     socket.onmessage = async (event) => {
-      console.log("Message received from WebSocket:", event.data);
 
       if (event.data instanceof Blob) {
         const reader = new FileReader();
@@ -66,10 +63,8 @@
 
   function handleWebSocketMessage(data) {
     if (data.action === 'updateSelectedUsers') {
-      console.log("Received action to update selected users list");
       fetchSelectedUsers();
     } else if (data.content && data.sender) {
-      console.log("Chat message received:", data);
       updateSelectedUsersOnMessage(data.sender, data.content);
       fetchSelectedUsers();
     } else {
@@ -79,28 +74,23 @@
 
   async function fetchSelectedUsers() {
     try {
-      console.log('Fetching selected users...');
       const response = await fetch('/api/selected-users');
       if (!response.ok) {
         throw new Error('Failed to fetch selected users');
       }
       const data = await response.json();
       selectedUsers = data.selectedUsers;
-      console.log('Selected users updated:', selectedUsers);
     } catch (error) {
       console.error('Error fetching selected users:', error);
     }
   }
 
   function updateSelectedUsersOnMessage(senderId, message) {
-    console.log('Updating selected users on message from:', senderId);
-    console.log('Current selected users:', JSON.stringify(selectedUsers, null, 2));
     const index = selectedUsers.findIndex(user => user._id === senderId);
     if (index !== -1) {
       selectedUsers[index].lastMessage = message; // Update last message
       const user = selectedUsers.splice(index, 1)[0];
       selectedUsers = [user, ...selectedUsers];
-      console.log('Updated selected users order:', JSON.stringify(selectedUsers, null, 2));
     } else {
       console.log('Sender not found in selected users:', senderId);
     }
@@ -108,11 +98,9 @@
 
   onMount(() => {
     const userId = window.location.pathname.split('/').pop();
-    console.log('Checking URL for user ID:', userId);
     const userToHighlight = selectedUsers.find(user => user._id === userId);
     if (userToHighlight) {
       currentSelectedUser = userToHighlight;
-      console.log('Highlighted user:', userToHighlight);
     } else {
       console.log('User to highlight not found:', userId);
     }
@@ -126,8 +114,6 @@
   }
 </style>
 
-<div id="selected-users">
-  
-  
+<div id="selected-users">  
     <UserList {selectedUsers} {currentSelectedUser} on:selectUser={selectUser}/>
 </div>
