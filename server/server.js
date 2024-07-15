@@ -77,13 +77,13 @@ app.use('/api/select-user', selectUser.selectUser);
 app.use('/api/selected-users', require('./controllers/selectedUsers'));
 app.use('/api/check-new-user', checkNewUser);
 
+// Serve static files from the Svelte build directory
+const buildPath = path.join(__dirname, '../client/.svelte-kit/output/client');
+app.use(express.static(buildPath));
 
-// Serve static files from the 'client/public' folder (where Svelte outputs files)
-app.use(express.static(path.join(__dirname, '../client/static')));
-
-// Serve the Svelte application
+// Serve the Svelte application for any route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/src'));
+  res.sendFile(path.join(buildPath, 'index.html'));
 });
 
 app.get('/api/users/:userid', async (req, res) => {
