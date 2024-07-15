@@ -30,6 +30,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@sveltejs/adapter-static": "^3.0.2",
 		"date-fns": "^3.6.0",
 		"svelte-routing": "^2.13.0"
 	}
