@@ -87,7 +87,7 @@
     fetchLoggedInUserId();
 
     console.log("Attempting to connect to WebSocket server...");
-    socket = new WebSocket('ws://localhost:3000');
+    socket = new WebSocket('ws://messenger-tu85.onrender.com');
 
     socket.onopen = () => {
       console.log("WebSocket connection established");

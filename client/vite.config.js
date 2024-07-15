@@ -5,9 +5,9 @@ export default defineConfig({
     plugins: [sveltekit()],
     server: {
         proxy: {
-            '/check-username': 'http://localhost:3000',
-            '/select-username': 'http://localhost:3000',
-            '/api': 'http://localhost:3000',
+            '/check-username': 'https://messenger-tu85.onrender.com',
+            '/select-username': 'https://messenger-tu85.onrender.com',
+            '/api': 'https://messenger-tu85.onrender.com',
         }
     }
 });

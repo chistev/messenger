@@ -20,7 +20,7 @@ router.get('/auth/google/callback',
       if (req.user.username) {
         res.redirect('/');
       } else {
-        res.redirect('http://localhost:5173/select');
+        res.redirect('https://svelte-of1p.onrender.com/select');
       }
     } else {
       res.redirect('/login');

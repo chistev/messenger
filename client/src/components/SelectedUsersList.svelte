@@ -23,7 +23,7 @@
   }
 
   onMount(() => {
-    socket = new WebSocket('ws://localhost:3000');
+    socket = new WebSocket('wss://messenger-tu85.onrender.com');
 
     socket.onopen = () => {
       fetchSelectedUsers();
