@@ -64,11 +64,6 @@ app.use(require('./middleware/session')(passport));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
-app.get('/', (req, res) => {
-  res.redirect(`https://messenger-tu85.onrender.com`);
-});
-
 app.use('/', require('./controllers/authControllers/authRoutes'));
 app.use('/', require('./controllers/authControllers/usernameRoutes'));
 app.use('/api/users', require('./controllers/users'));
