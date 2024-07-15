@@ -1,19 +1,14 @@
 const express = require('express');
-const path = require('path');
 const WebSocket = require('ws');
 const app = express();
 const port = 3000;
 const { createServer } = require('http');
 const dotenv = require('dotenv');
 const passport = require('passport');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const clientport = 5173;
 const User = require('./models/User');
-const Message = require('./models/Message');
 const selectUser = require('./controllers/selectUser');
-const checkNewUser = require('./middleware/checkNewUser'); // Adjust the path as necessary
-
+const checkNewUser = require('./middleware/checkNewUser'); 
+const cors = require('cors');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -59,6 +54,11 @@ wss.on('connection', (ws) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(require('./middleware/session')(passport));
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
 // Passport configuration
 app.use(passport.initialize());
