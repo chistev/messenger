@@ -72,15 +72,6 @@ app.use('/api/select-user', selectUser.selectUser);
 app.use('/api/selected-users', require('./controllers/selectedUsers'));
 app.use('/api/check-new-user', checkNewUser);
 
-// Serve static files from the Svelte build directory
-const buildPath = path.join(__dirname, '../client/.svelte-kit/output/client');
-app.use(express.static(buildPath));
-
-// Serve the Svelte application for any route
-app.get('*', (req, res) => {
-  const entryPoint = path.join(buildPath, '_app', 'immutable', 'entry', 'app.js'); // Adjust the path to match the generated entry point
-  res.sendFile(entryPoint);
-});
 
 app.get('/api/users/:userid', async (req, res) => {
   try {
