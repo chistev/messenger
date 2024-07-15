@@ -78,7 +78,8 @@ app.use(express.static(buildPath));
 
 // Serve the Svelte application for any route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(buildPath, 'app.html'));
+  const entryPoint = path.join(buildPath, '_app', 'immutable', 'entry', 'app.js'); // Adjust the path to match the generated entry point
+  res.sendFile(entryPoint);
 });
 
 app.get('/api/users/:userid', async (req, res) => {
