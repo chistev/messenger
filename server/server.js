@@ -66,7 +66,7 @@ app.use(passport.session());
 
 // Routes
 app.get('/', (req, res) => {
-  res.redirect(`http://localhost:${clientport}/`);
+  res.redirect(`https://messenger-tu85.onrender.com`);
 });
 
 app.use('/', require('./controllers/authControllers/authRoutes'));
@@ -83,7 +83,7 @@ app.use(express.static(buildPath));
 
 // Serve the Svelte application for any route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(buildPath, 'index.html'));
+  res.sendFile(path.join(buildPath, 'app.html'));
 });
 
 app.get('/api/users/:userid', async (req, res) => {
