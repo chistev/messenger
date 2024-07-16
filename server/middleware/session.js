@@ -13,8 +13,8 @@ module.exports = (passport) => {
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
       secure: process.env.NODE_ENV === 'production', // Set to true in production
-      httpOnly: true,
-      sameSite: 'lax' // Adjust based on your cross-origin requirements
+      httpOnly: false,
+      sameSite: 'none' // Adjust based on your cross-origin requirements
     }
   });
 };
