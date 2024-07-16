@@ -14,16 +14,16 @@ router.get('/signin', (req, res) => {
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
+  passport.authenticate('google', { failureRedirect: 'https://svelte-of1p.onrender.com/signin' }),
   (req, res) => {
     if (req.user) {
       if (req.user.username) {
-        res.redirect('/');
+        res.redirect('https://svelte-of1p.onrender.com');
       } else {
         res.redirect('https://svelte-of1p.onrender.com/select');
       }
     } else {
-      res.redirect('/login');
+      res.redirect('https://svelte-of1p.onrender.com/signin');
     }
   }
 );
