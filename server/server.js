@@ -56,7 +56,7 @@ app.use(express.json());
 app.use(require('./middleware/session')(passport));
 
 app.use(cors({
-  origin: 'https://messenger-tu85.onrender.com',
+  origin: 'https://svelte-of1p.onrender.com',
   credentials: true
 }));
 
