@@ -13,7 +13,7 @@
 
     const checkUserStatus = async () => {
         try {
-            const response = await fetch('/api/check-new-user');
+            const response = await fetch('https://messenger-tu85.onrender.com/api/check-new-user');
             if (response.status === 401) {
                 window.location.href = '/signin'; 
                 return;
