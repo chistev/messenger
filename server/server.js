@@ -7,9 +7,10 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 const User = require('./models/User');
 const selectUser = require('./controllers/selectUser');
-const checkNewUser = require('./middleware/checkNewUser'); 
+const checkNewUser = require('./middleware/checkNewUser');
 const cors = require('cors');
-const session = require('./middleware/session');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -18,15 +19,35 @@ dotenv.config();
 const connectDB = require('./config/mongoose');
 connectDB();
 
+// Session configuration
+app.use(session({
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    collectionName: 'sessions'
+  }),
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    secure: process.env.NODE_ENV === 'production', // Set to true in production
+    httpOnly: true,
+    sameSite: 'none' // Adjust based on your cross-origin requirements
+  }
+}));
+
+
 // Initialize Passport
 const initializePassport = require('./config/passport');
 initializePassport(passport);
+
+// Create HTTP server
 const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
+// WebSocket handling
 wss.on('connection', (ws) => {
   ws.on('message', (message) => {
-    // Attempt to parse the received message
     try {
       const parsedMessage = JSON.parse(message);
       console.log('Parsed message:', parsedMessage);
@@ -34,7 +55,6 @@ wss.on('connection', (ws) => {
       console.error('Error parsing JSON:', error);
     }
 
-    // Broadcast message to all connected clients
     wss.clients.forEach((client) => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(message);
@@ -51,23 +71,19 @@ wss.on('connection', (ws) => {
   });
 });
 
-// Middleware
+// Middleware setup
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(session(passport)); // session middleware is used before passport initialization
-app.use(require('./middleware/session')(passport));
+app.use(passport.initialize()); // Passport initialization
+app.use(passport.session()); // Passport session setup
 
-
-
+// CORS setup
 app.use(cors({
   origin: 'https://svelte-of1p.onrender.com',
   credentials: true
 }));
 
-// Passport configuration
-app.use(passport.initialize());
-app.use(passport.session());
-
+// Routes setup
 app.use('/', require('./controllers/authControllers/authRoutes'));
 app.use('/', require('./controllers/authControllers/usernameRoutes'));
 app.use('/api/users', require('./controllers/users'));
@@ -76,7 +92,7 @@ app.use('/api/select-user', selectUser.selectUser);
 app.use('/api/selected-users', require('./controllers/selectedUsers'));
 app.use('/api/check-new-user', checkNewUser);
 
-
+// Endpoint to retrieve user by ID
 app.get('/api/users/:userid', async (req, res) => {
   try {
     const user = await User.findById(req.params.userid);
@@ -89,6 +105,7 @@ app.get('/api/users/:userid', async (req, res) => {
   }
 });
 
+// Endpoint to retrieve logged-in user ID
 app.get('/api/loggedInUserId', async (req, res) => {
   console.log('Session:', req.session);
   console.log('User:', req.user);
@@ -104,15 +121,18 @@ app.get('/api/loggedInUserId', async (req, res) => {
   }
 });
 
+// Endpoint to handle logout
 app.post('/api/logout', (req, res) => {
   req.session.destroy(err => {
-      if (err) {
-          return res.status(500).json({ message: 'Logout failed' });
-      }
-      res.clearCookie('connect.sid'); // Assuming 'connect.sid' is your session cookie name
-      return res.status(200).json({ message: 'Logged out successfully' });
+    if (err) {
+      return res.status(500).json({ message: 'Logout failed' });
+    }
+    res.clearCookie('connect.sid'); // Assuming 'connect.sid' is your session cookie name
+    return res.status(200).json({ message: 'Logged out successfully' });
   });
 });
+
+// Start the server
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
