@@ -89,6 +89,8 @@ app.get('/api/users/:userid', async (req, res) => {
 });
 
 app.get('/api/loggedInUserId', async (req, res) => {
+  console.log('Session:', req.session);
+  console.log('User:', req.user);
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
