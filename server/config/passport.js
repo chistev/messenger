@@ -9,15 +9,19 @@ module.exports = function(passport) {
       callbackURL: 'https://messenger-tu85.onrender.com/auth/google/callback',
     },
     (accessToken, refreshToken, profile, done) => {
+      console.log('Google profile:', profile);
+
       User.findOne({ googleId: profile.id })
         .then(existingUser => {
           if (existingUser) {
+            console.log('Existing user found:', existingUser);
             return done(null, existingUser);
           } else {
             const tempUser = {
               googleId: profile.id,
               email: profile.emails[0].value
             };
+            console.log('Creating new temp user:', tempUser);
             return done(null, tempUser);
           }
         })
@@ -29,6 +33,7 @@ module.exports = function(passport) {
   ));
 
   passport.serializeUser((user, done) => {
+    console.log('Serialize user:', user);
     if (user._id) {
       done(null, user._id);
     } else {
@@ -37,12 +42,19 @@ module.exports = function(passport) {
   });
 
   passport.deserializeUser((id, done) => {
+    console.log('Deserialize user id:', id);
     if (typeof id === 'object' && id.googleId) {
       done(null, id);
     } else {
       User.findById(id)
-        .then(user => done(null, user))
-        .catch(err => done(err));
+        .then(user => {
+          console.log('Deserialized user:', user);
+          done(null, user);
+        })
+        .catch(err => {
+          console.error('Error fetching user:', err);
+          done(err);
+        });
     }
   });
 };
