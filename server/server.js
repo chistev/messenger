@@ -54,9 +54,10 @@ wss.on('connection', (ws) => {
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(session(passport)); // session middleware is used before passport initialization
 app.use(require('./middleware/session')(passport));
 
-app.use(session(passport)); // session middleware is used before passport initialization
+
 
 app.use(cors({
   origin: 'https://svelte-of1p.onrender.com',
