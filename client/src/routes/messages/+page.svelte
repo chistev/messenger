@@ -53,7 +53,7 @@
                 window.location.href = '/signin';
                 return;
             }
-
+            // other javascript code
             const response = await fetch('/api/selected-users', {
                 credentials: 'include'
             });
