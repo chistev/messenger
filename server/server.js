@@ -56,12 +56,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(require('./middleware/session')(passport));
 
+app.use(session(passport)); // session middleware is used before passport initialization
+
 app.use(cors({
   origin: 'https://svelte-of1p.onrender.com',
   credentials: true
 }));
-
-app.use(session(passport)); // session middleware is used before passport initialization
 
 // Passport configuration
 app.use(passport.initialize());

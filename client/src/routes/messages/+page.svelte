@@ -43,10 +43,12 @@
 
     onMount(async () => {
         try {
+            console.log('Fetching logged in user ID');
             const authResponse = await fetch('/api/loggedInUserId', {
                 credentials: 'include'
             });
 
+            console.log('Auth Response:', authResponse);
             if (!authResponse.ok) {
                 window.location.href = '/signin';
                 return;
