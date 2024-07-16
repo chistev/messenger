@@ -9,6 +9,7 @@ const User = require('./models/User');
 const selectUser = require('./controllers/selectUser');
 const checkNewUser = require('./middleware/checkNewUser'); 
 const cors = require('cors');
+const session = require('./middleware/session');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -59,6 +60,8 @@ app.use(cors({
   origin: 'https://svelte-of1p.onrender.com',
   credentials: true
 }));
+
+app.use(session(passport)); // session middleware is used before passport initialization
 
 // Passport configuration
 app.use(passport.initialize());
