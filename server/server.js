@@ -51,11 +51,6 @@ wss.on('connection', (ws) => {
   });
 });
 
-app.use(cors({
-  origin: 'https://svelte-of1p.onrender.com',
-  credentials: true
-}));
-
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
