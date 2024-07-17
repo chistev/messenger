@@ -82,27 +82,43 @@ app.use('/api/check-new-user', checkNewUser);
 // Example route handler in Express.js
 app.get('/api/loggedInUserId', async (req, res) => {
   try {
-    // Log the incoming request headers
-    console.log('Request Headers:', req.headers);
+    console.log('Received request to /api/loggedInUserId');
 
     // Check if the 'connect.sid' cookie is present
     const cookie = req.headers.cookie;
-    if (cookie && cookie.includes('connect.sid')) {
-      console.log('connect.sid cookie found in request.');
-    } else {
-      console.log('connect.sid cookie not found in request.');
+    console.log('Cookies received:', cookie);
+
+    if (!cookie || !cookie.includes('connect.sid')) {
+      console.error('connect.sid cookie not found in request.');
+      throw new Error('connect.sid cookie not found in request.');
     }
 
-    // Your logic to handle the request
-    // Retrieve logged in user ID from session or database
-    const loggedInUserId = req.user._id; // Assuming req.user is set correctly by passport
+    // Assuming you are using express-session for session management
+    const sessionID = cookie.split('connect.sid=')[1].split(';')[0].trim();
+    console.log('Extracted session ID:', sessionID);
 
-    if (!loggedInUserId) {
-      throw new Error('User ID not found'); // Example error handling
-    }
+    // Retrieve the session data using the sessionID
+    req.sessionStore.get(sessionID, (err, session) => {
+      if (err || !session) {
+        console.error('Error retrieving session:', err);
+        throw new Error('Session retrieval failed');
+      }
+      
+      console.log('Session data retrieved:', session);
 
-    // Respond with the logged in user ID
-    res.json({ loggedInUserId });
+      // Assuming req.user is set correctly by passport during authentication
+      const loggedInUserId = req.user._id; // Assuming req.user is set correctly by passport
+
+      if (!loggedInUserId) {
+        console.error('User ID not found in session.');
+        throw new Error('User ID not found');
+      }
+
+      console.log('Logged in user ID:', loggedInUserId);
+
+      // Respond with the logged in user ID
+      res.json({ loggedInUserId });
+    });
   } catch (error) {
     console.error('Error fetching logged in user ID:', error);
     res.status(500).json({ error: 'Server Error' });
