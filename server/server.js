@@ -79,18 +79,32 @@ app.use('/api/select-user', selectUser.selectUser);
 app.use('/api/selected-users', require('./controllers/selectedUsers'));
 app.use('/api/check-new-user', checkNewUser);
 
-// Example API route using session
+// Example route handler in Express.js
 app.get('/api/loggedInUserId', async (req, res) => {
-  console.log('Session:', req.session);
-  console.log('User:', req.user);
   try {
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      throw new Error('User not found');
+    // Log the incoming request headers
+    console.log('Request Headers:', req.headers);
+
+    // Check if the 'connect.sid' cookie is present
+    const cookie = req.headers.cookie;
+    if (cookie && cookie.includes('connect.sid')) {
+      console.log('connect.sid cookie found in request.');
+    } else {
+      console.log('connect.sid cookie not found in request.');
     }
-    res.json({ loggedInUserId: user._id });
+
+    // Your logic to handle the request
+    // Retrieve logged in user ID from session or database
+    const loggedInUserId = req.user._id; // Assuming req.user is set correctly by passport
+
+    if (!loggedInUserId) {
+      throw new Error('User ID not found'); // Example error handling
+    }
+
+    // Respond with the logged in user ID
+    res.json({ loggedInUserId });
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error('Error fetching logged in user ID:', error);
     res.status(500).json({ error: 'Server Error' });
   }
 });
