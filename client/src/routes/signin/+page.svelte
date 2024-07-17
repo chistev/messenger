@@ -37,7 +37,7 @@
         </div>
 
         <div class="text-center w-100" style="max-width: 300px;">
-          <p class="text-light fw-bold" style="font-family: Verdana, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Already have an account?</p>
+          <p class="text-light fw-bold" style="font-family: Verdana, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Don't have an account?</p>
           <a href="/signup" class="btn btn-outline-light sign-in-btn rounded-pill w-100 text-primary" style="color: #1d9bf0;">
             Sign up
           </a>
