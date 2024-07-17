@@ -45,7 +45,6 @@
         try {
             console.log('Fetching logged in user ID');
             const authResponse = await fetch('https://messenger-tu85.onrender.com/api/loggedInUserId', {
-                credentials: 'include'
             });
 
             console.log('Auth Response:', authResponse);
