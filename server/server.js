@@ -57,15 +57,18 @@ app.use(cors({
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(require('./middleware/session')(passport)); // Session middleware
+app.use(require('./middleware/session')(passport));
+// Passport configuration
 app.use(passport.initialize());
-app.use(passport.session()); // Passport session middleware
+app.use(passport.session());
+
 
 // Logging middleware for session
 app.use((req, res, next) => {
   console.log('Session Middleware:', req.session);
   next();
 });
+
 
 // Routes
 app.use('/', require('./controllers/authControllers/authRoutes'));

@@ -20,6 +20,13 @@ router.get('/auth/google/callback',
     console.log('User authenticated:', req.user);
     console.log('Session Data after login:', req.session);
     if (req.user) {
+      // Manually set the cookie
+      res.cookie('connect.sid', req.sessionID, {
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        secure: process.env.NODE_ENV === 'production', // True in production
+        httpOnly: false, // Allow client-side access
+        sameSite: 'None' // Allow cross-site cookies
+      });
       if (req.user.username) {
         res.redirect('https://svelte-of1p.onrender.com');
       } else {
