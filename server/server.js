@@ -107,10 +107,14 @@ app.get('/api/loggedInUserId', async (req, res) => {
       console.log('Session data retrieved:', session);
 
       // Assuming req.user is set correctly by passport during authentication
-      const loggedInUserId = req.user._id; // Assuming req.user is set correctly by passport
+      req.user = { _id: session.passport.user }; // Set req.user from session data
+
+      console.log('req.user:', req.user);
+
+      const loggedInUserId = req.user._id;
 
       if (!loggedInUserId) {
-        console.error('User ID not found in session.');
+        console.error('User ID not found.');
         throw new Error('User ID not found');
       }
 
