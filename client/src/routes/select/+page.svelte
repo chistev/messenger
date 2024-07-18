@@ -9,29 +9,31 @@
     let formDisabled = true;
     let userExists = false;
 
-    const dispatcher = createEventDispatcher();
-
     const checkUserStatus = async () => {
-        try {
-            const response = await fetch('https://messenger-tu85.onrender.com/api/check-new-user');
-            if (response.status === 401) {
-                window.location.href = '/signin'; 
-                return;
-            }
-            const data = await response.json();
-            userExists = data.exists;
-            if (userExists) {
-                window.location.href = '/messages'; 
-                return;
-            } else {
-                errorMessage = '';
-                successMessage = '';
-                formDisabled = false;
-            }
-        } catch (error) {
-            console.error('Error checking user status:', error);
+    try {
+        const response = await fetch('https://messenger-tu85.onrender.com/api/check-new-user', {
+            credentials: 'include'
+        });
+        
+        if (response.status === 401) {
+            window.location.href = '/messages';
+            return;
         }
-    };
+        
+        const data = await response.json();
+        userExists = data.exists;
+        
+        if (userExists) {
+            window.location.href = '/messages';
+        } else {
+            errorMessage = '';
+            successMessage = '';
+            formDisabled = false;
+        }
+    } catch (error) {
+        console.error('Error checking user status:', error);
+    }
+};
 
     onMount(checkUserStatus); 
 
@@ -88,29 +90,31 @@
     };
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
+    event.preventDefault();
 
-        try {
-            const response = await fetch(`https://messenger-tu85.onrender.com/select-username`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username })
-            });
+    try {
+        const response = await fetch(`https://messenger-tu85.onrender.com/select-username`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username }),
+            credentials: 'include'
+        });
 
-            const data = await response.json();
-            if (data.error) {
-                errorMessage = data.error;
-                successMessage = '';
-                formDisabled = true;
-            } else {
-                window.location.href = '/messages';
-            }
-        } catch (error) {
-            console.error('Error submitting form:', error);
+        const data = await response.json();
+        if (data.error) {
+            errorMessage = data.error;
+            successMessage = '';
+            formDisabled = true;
+        } else {
+            window.location.href = '/messages';
         }
-    };
+    } catch (error) {
+        console.error('Error submitting form:', error);
+    }
+};
+
 </script>
 
 <style>

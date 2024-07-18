@@ -2,8 +2,8 @@ const User = require('../models/User');
 
 const checkNewUser = async (req, res, next) => {
   try {
-    if (!req.isAuthenticated() || !req.user) {
-      return res.status(401).json({ error: 'User not authenticated' });
+    if (req.isAuthenticated() || req.user) {
+      return res.status(401).json({ error: 'User already authenticated' });
     }
 
     const existingUser = await User.findOne({ googleId: req.user.googleId });
@@ -19,3 +19,4 @@ const checkNewUser = async (req, res, next) => {
 };
 
 module.exports = checkNewUser;
+ 
