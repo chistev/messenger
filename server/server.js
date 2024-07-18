@@ -58,6 +58,12 @@ app.use(require('./middleware/session')(passport));
 app.use(passport.initialize());
 app.use(passport.session());
 
+// middleware to make WebSocket server accessible in routes
+app.use((req, res, next) => {
+  req.wss = wss;
+  next();
+});
+
 app.use('/api', deserializeUser);
 
 app.use('/', require('./controllers/authControllers/authRoutes'));

@@ -16,9 +16,6 @@ router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 
 router.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: 'https://svelte-of1p.onrender.com/signin' }),
   (req, res) => {
-    // Successful authentication
-    console.log('User authenticated:', req.user);
-    console.log('Session Data after login:', req.session);
     if (req.user) {
       // Manually set the cookie
       res.cookie('connect.sid', req.sessionID, {
