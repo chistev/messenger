@@ -53,8 +53,7 @@
                 window.location.href = '/signin';
                 return;
             }
-            // other javascript code
-            const response = await fetch('/api/selected-users', {
+            const response = await fetch('https://messenger-tu85.onrender.com/api/selected-users', {
                 credentials: 'include'
             });
             const data = await response.json();

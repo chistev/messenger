@@ -5,21 +5,12 @@
   export let selectedUsers = [];
   const dispatch = createEventDispatcher();
   let currentSelectedUser = null;
-  let isInputFocused = false;
   let socket;
 
   function selectUser(event) {
     const user = event.detail;
     dispatch('selectUser', user);
     currentSelectedUser = user;
-  }
-
-  function handleFocus() {
-    isInputFocused = true;
-  }
-
-  function handleBack() {
-    isInputFocused = false;
   }
 
   onMount(() => {
@@ -73,17 +64,19 @@
   }
 
   async function fetchSelectedUsers() {
-    try {
-      const response = await fetch('/api/selected-users');
-      if (!response.ok) {
-        throw new Error('Failed to fetch selected users');
-      }
-      const data = await response.json();
-      selectedUsers = data.selectedUsers;
-    } catch (error) {
-      console.error('Error fetching selected users:', error);
+  try {
+    const response = await fetch('https://messenger-tu85.onrender.com/api/selected-users', {
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch selected users');
     }
+    const data = await response.json();
+    selectedUsers = data.selectedUsers;
+  } catch (error) {
+    console.error('Error fetching selected users:', error);
   }
+}
 
   function updateSelectedUsersOnMessage(senderId, message) {
     const index = selectedUsers.findIndex(user => user._id === senderId);
