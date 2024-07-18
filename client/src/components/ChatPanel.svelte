@@ -14,7 +14,7 @@
     event.preventDefault();
     if (newMessage.trim()) {
       const message = {
-        _id: generateUniqueId(),  // Unique ID for each message
+        _id: generateUniqueId(),  
         content: newMessage,
         type: "sent",
         sender: loggedInUserId,
@@ -26,19 +26,20 @@
       messages = [...messages, message];
 
       // Send the message to the server via WebSocket
+      console.log("Sending message through WebSocket:", message);
       socket.send(JSON.stringify(message));
 
       // Save the message to the database
       await saveMessage(message);
 
       // Clear the input field
-      newMessage = "";
+      newMessage = ""; 
     }
   }
 
   function generateUniqueId() {
-    return '_' + Math.random().toString(36).substr(2, 9);
-  }
+  return '_' + Math.random().toString(36).substring(2, 11);
+}
 
   async function saveMessage(message) {
     try {
@@ -106,37 +107,22 @@
     };
 
     socket.onmessage = (event) => {
-      const processMessage = (receivedMessage) => {
+      console.log("Message received from WebSocket:", event.data);
+
+      try {
+        let receivedMessage = JSON.parse(event.data);
         receivedMessage.timestamp = new Date(receivedMessage.timestamp);
 
         const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
 
-        // Check if the message is not a duplicate and is intended for the current user
-        if (!isDuplicate) {
+        if (receivedMessage.recipient === loggedInUserId && !isDuplicate) {
           messages = [...messages, receivedMessage];
+          console.log('Parsed received message:', receivedMessage);
         } else {
           console.log('Duplicate message received or not intended for the current user.');
         }
-      };
-
-      if (event.data instanceof Blob) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const receivedMessage = JSON.parse(reader.result);
-            processMessage(receivedMessage);
-          } catch (error) {
-            console.error('Error parsing JSON from WebSocket message:', error);
-          }
-        };
-        reader.readAsText(event.data);
-      } else {
-        try {
-          const receivedMessage = JSON.parse(event.data);
-          processMessage(receivedMessage);
-        } catch (error) {
-          console.error('Error parsing JSON from WebSocket message:', error);
-        }
+      } catch (error) {
+        console.error('Error parsing JSON from WebSocket message:', error);
       }
     };
 
