@@ -5,10 +5,23 @@ const Message = require('../models/Message');
 
 router.get('/', async (req, res) => {
   try {
+    console.log('selected-users route called');
+    console.log('Request received:', {
+      headers: req.headers,
+      user: req.user
+    });
+
+    if (!req.user) {
+      console.log('No user found in session');
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
     const loggedInUserId = req.user._id;
+    console.log('Logged in user ID:', loggedInUserId);
 
     const user = await User.findById(loggedInUserId).populate('selectedUsers');
     if (!user) {
+      console.log('User not found');
       return res.status(404).json({ message: 'User not found' });
     }
 

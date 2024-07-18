@@ -22,9 +22,9 @@ router.get('/check-username', async (req, res) => {
 router.post('/select-username', deserializeUser, async (req, res) => {
     console.log('select-username route called');
     console.log('Request received:', {
-      headers: req.headers,
-      body: req.body,
-      user: req.user
+        headers: req.headers,
+        body: req.body,
+        user: req.user
     });
 
     const tempUser = req.user;
