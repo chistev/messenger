@@ -6,31 +6,31 @@
   const dispatch = createEventDispatcher();
   
   async function selectUser(selectedUser) {
-    try {
+  try {
+    const response = await fetch('https://messenger-tu85.onrender.com/api/select-user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        selectedUserId: selectedUser._id,
+      }),
+    });
 
-      const response = await fetch('/api/select-user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          selectedUserId: selectedUser._id,
-        }),
-      });
-
-
-      if (!response.ok) {
-        console.error('Network response was not ok:', response.status, response.statusText);
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      dispatch('selectUser', selectedUser);
-    } catch (error) {
-      console.error('Error selecting user:', error);
-      // Handle error condition
+    if (!response.ok) {
+      console.error('Network response was not ok:', response.status, response.statusText);
+      throw new Error('Network response was not ok');
     }
+
+    const data = await response.json();
+    dispatch('selectUser', selectedUser);
+  } catch (error) {
+    console.error('Error selecting user:', error);
+    // Handle error condition
   }
+}
+
 </script>
 
 {#each users as user}
