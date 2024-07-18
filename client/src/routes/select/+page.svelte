@@ -1,6 +1,5 @@
 <script>
     import { onMount } from 'svelte';
-    import { createEventDispatcher } from 'svelte';
 
     let username = '';
     let csrfToken = ''; 
