@@ -95,7 +95,7 @@ async function fetchLoggedInUserId() {
     fetchLoggedInUserId();
 
     console.log("Attempting to connect to WebSocket server...");
-    socket = new WebSocket('ws://messenger-tu85.onrender.com');
+    socket = new WebSocket('wss://messenger-tu85.onrender.com');
 
     socket.onopen = () => {
       console.log("WebSocket connection established");

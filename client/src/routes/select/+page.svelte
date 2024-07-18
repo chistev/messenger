@@ -37,7 +37,7 @@
 
     const checkUsernameAvailability = async (username) => {
         try {
-            const response = await fetch(`/check-username?username=${username}`);
+            const response = await fetch(`https://messenger-tu85.onrender.com/check-username?username=${username}`);
             const data = await response.json();
             if (data.available) {
                 successMessage = 'Username available!';
@@ -91,7 +91,7 @@
         event.preventDefault();
 
         try {
-            const response = await fetch(`/select-username`, {
+            const response = await fetch(`https://messenger-tu85.onrender.com/select-username`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
