@@ -31,14 +31,20 @@
   });
 
   async function fetchUsers(query) {
-    try {
-      const response = await fetch(`https://messenger-tu85.onrender.com/api/users?username=${query}`);
-      const data = await response.json();
-      users = data;
-    } catch (error) {
-      console.error('Error fetching users:', error);
+  try {
+    const response = await fetch(`https://messenger-tu85.onrender.com/api/users?username=${query}`, {
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch users');
     }
+    const data = await response.json();
+    users = data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
   }
+}
+
 
   function handleInput(event) {
     const query = event.target.value;
