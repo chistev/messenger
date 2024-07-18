@@ -10,21 +10,30 @@
 
     const checkUserStatus = async () => {
     try {
+        console.log('checkUserStatus function called');
+        
         const response = await fetch('https://messenger-tu85.onrender.com/api/check-new-user', {
             credentials: 'include'
         });
-        
+
+        console.log('Response status:', response.status);
+
         if (response.status === 401) {
+            console.log('Unauthorized: Redirecting to sign-in page');
             window.location.href = '/signin';
             return;
         }
-        
+
         const data = await response.json();
-        userExists = data.exists;
+        console.log('Response data:', data);
         
+        userExists = data.exists;
+
         if (userExists) {
+            console.log('User exists: Redirecting to messages');
             window.location.href = '/messages';
         } else {
+            console.log('User does not exist: Enabling form');
             errorMessage = '';
             successMessage = '';
             formDisabled = false;
