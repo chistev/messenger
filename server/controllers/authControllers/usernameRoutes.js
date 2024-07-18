@@ -64,13 +64,25 @@ router.post('/select-username', deserializeUser, async (req, res) => {
     try {
         console.log('Saving new user:', newUser);
         await newUser.save();
+        
+        // Debugging statements
+        console.log('New user saved:', newUser);
+        console.log('Assigning user ID to session:', newUser._id);
+        
         req.login(newUser, function (err) {
             if (err) {
                 console.error('Error logging in newly created user:', err);
                 return res.status(500).json({ error: 'Server error' });
             }
+            
+            // Debugging statements
+            console.log('Before assignment, session:', req.session);
+            
             req.session.passport.user = newUser._id;
-            console.log('New user logged in, session updated:', req.session);
+
+            // Debugging statements
+            console.log('After assignment, session:', req.session);
+            
             res.json({ success: true });
         });
     } catch (error) {
@@ -78,5 +90,6 @@ router.post('/select-username', deserializeUser, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 module.exports = router;
