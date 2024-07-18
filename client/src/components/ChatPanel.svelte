@@ -37,50 +37,58 @@
   }
 
   async function saveMessage(message) {
-    try {
-      const response = await fetch(`/api/messages/${currentChatUser._id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(message)
-      });
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-      console.log("Message sent and saved:", message);
-    } catch (error) {
-      console.error('Error saving message:', error);
+  try {
+    const response = await fetch(`https://messenger-tu85.onrender.com/api/messages/${currentChatUser._id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include', 
+      body: JSON.stringify(message)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to send message');
     }
+    console.log("Message sent and saved:", message);
+  } catch (error) {
+    console.error('Error saving message:', error);
   }
+}
 
-  async function fetchMessages() {
-    try {
-      const response = await fetch(`/api/messages/${currentChatUser._id}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch messages');
-      }
-      const data = await response.json();
-      messages = data.messages.map(message => ({
-        ...message,
-        timestamp: new Date(message.timestamp)
-      }));
-      console.log(`Messages fetched for User ID: ${currentChatUser._id}`, messages);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
+async function fetchMessages() {
+  try {
+    const response = await fetch(`https://messenger-tu85.onrender.com/api/messages/${currentChatUser._id}`, {
+      credentials: 'include' 
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch messages');
     }
+    const data = await response.json();
+    messages = data.messages.map(message => ({
+      ...message,
+      timestamp: new Date(message.timestamp)
+    }));
+    console.log(`Messages fetched for User ID: ${currentChatUser._id}`, messages);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
   }
+}
 
-  async function fetchLoggedInUserId() {
-    try {
-      const response = await fetch('/api/loggedInUserId');
-      const data = await response.json();
-      loggedInUserId = data.loggedInUserId;
-      console.log("Logged in user ID fetched:", loggedInUserId);
-    } catch (error) {
-      console.error('Error fetching loggedInUserId:', error);
+async function fetchLoggedInUserId() {
+  try {
+    const response = await fetch('https://messenger-tu85.onrender.com/api/loggedInUserId', {
+      credentials: 'include' 
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch logged in user ID');
     }
+    const data = await response.json();
+    loggedInUserId = data.loggedInUserId;
+    console.log("Logged in user ID fetched:", loggedInUserId);
+  } catch (error) {
+    console.error('Error fetching loggedInUserId:', error);
   }
+}
 
   onMount(() => {
     fetchMessages();
