@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../models/User');
+const deserializeUser = require('../../middleware/deserializeUser')
 
 router.get('/check-username', async (req, res) => {
     const { username } = req.query;
@@ -18,11 +19,19 @@ router.get('/check-username', async (req, res) => {
     }
 });
 
-router.post('/select-username', async (req, res) => {
-    const tempUser = req.user; 
+router.post('/select-username', deserializeUser, async (req, res) => {
+    console.log('select-username route called');
+    console.log('Request received:', {
+      headers: req.headers,
+      body: req.body,
+      user: req.user
+    });
+
+    const tempUser = req.user;
 
     if (!tempUser) {
-        return res.redirect('/logout');
+        console.log('No user found in session, redirecting to sign-in');
+        return res.redirect('/signin');
     }
 
     const { username } = req.body;
@@ -35,12 +44,14 @@ router.post('/select-username', async (req, res) => {
         errors.push('Your username can only contain letters, numbers, and \'_\'.');
     }
 
+    console.log('Validating username:', username);
     const existingUser = await User.findOne({ googleId: tempUser.googleId });
     if (existingUser && existingUser.username) {
         errors.push('You have already created a username.');
     }
 
     if (errors.length > 0) {
+        console.log('Validation errors:', errors);
         return res.status(400).json({ error: errors.join(' ') });
     }
 
@@ -51,6 +62,7 @@ router.post('/select-username', async (req, res) => {
     });
 
     try {
+        console.log('Saving new user:', newUser);
         await newUser.save();
         req.login(newUser, function (err) {
             if (err) {
@@ -58,6 +70,7 @@ router.post('/select-username', async (req, res) => {
                 return res.status(500).json({ error: 'Server error' });
             }
             req.session.passport.user = newUser._id;
+            console.log('New user logged in, session updated:', req.session);
             res.json({ success: true });
         });
     } catch (error) {
