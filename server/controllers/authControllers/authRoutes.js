@@ -24,24 +24,11 @@ router.get('/auth/google/callback',
         httpOnly: false, // Allow client-side access
         sameSite: 'None' // Allow cross-site cookies
       });
-
-      // Check if the user exists based on API response
-      fetch('https://messenger-tu85.onrender.com/api/check-new-user', {
-        credentials: 'include'
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.exists) {
-            res.redirect('https://svelte-of1p.onrender.com/messages');
-          } else {
-            res.redirect('https://svelte-of1p.onrender.com/select');
-          }
-        })
-        .catch(error => {
-          console.error('Error checking new user:', error);
-          res.redirect('https://svelte-of1p.onrender.com/signin');
-        });
-
+      if (req.user.username) {
+        res.redirect('https://svelte-of1p.onrender.com');
+      } else {
+        res.redirect('https://svelte-of1p.onrender.com/select');
+      }
     } else {
       res.redirect('https://svelte-of1p.onrender.com/signin');
     }

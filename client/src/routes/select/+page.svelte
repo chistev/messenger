@@ -15,7 +15,7 @@
         });
         
         if (response.status === 401) {
-            window.location.href = '/messages';
+            window.location.href = '/signin';
             return;
         }
         

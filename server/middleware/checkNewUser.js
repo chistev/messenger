@@ -2,13 +2,18 @@ const User = require('../models/User');
 
 const checkNewUser = async (req, res, next) => {
   try {
-    if (req.isAuthenticated() || req.user) {
-      return res.status(401).json({ error: 'User already authenticated' });
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const existingUser = await User.findOne({ googleId: req.user.googleId });
-    if (existingUser && existingUser.username) {
-      return res.json({ exists: true });
+
+    if (existingUser) {
+      if (existingUser.username) {
+        return res.json({ exists: true });
+      } else {
+        return res.json({ exists: false });
+      }
     } else {
       return res.json({ exists: false });
     }
@@ -19,4 +24,3 @@ const checkNewUser = async (req, res, next) => {
 };
 
 module.exports = checkNewUser;
- 
