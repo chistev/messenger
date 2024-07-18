@@ -1,6 +1,5 @@
 <script>
   export let showModal;
-
   import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import RetrievedUsers from './RetrievedUsers.svelte';
@@ -33,7 +32,7 @@
 
   async function fetchUsers(query) {
     try {
-      const response = await fetch(`/api/users?username=${query}`);
+      const response = await fetch(`https://messenger-tu85.onrender.com/api/users?username=${query}`);
       const data = await response.json();
       users = data;
     } catch (error) {
