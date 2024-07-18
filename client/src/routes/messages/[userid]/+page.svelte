@@ -1,6 +1,5 @@
 <script>
     import { onMount } from 'svelte';
-    import { onDestroy } from 'svelte';
     import Spinner from '../../../components/Spinner.svelte';
     import ChatPanel from '../../../components/ChatPanel.svelte';
     import MessageModal from '../../../components/MessageModal.svelte';
@@ -34,7 +33,7 @@
 
     async function fetchUserById(userId) {
         console.log("fetchUserById called with userId", userId);
-        const response = await fetch(`/api/users/${userId}`, {
+        const response = await fetch(`https://messenger-tu85.onrender.com/api/users/${userId}`, {
             credentials: 'include'
         });
         if (!response.ok) {
@@ -49,7 +48,7 @@
         const userId = window.location.pathname.split('/').pop(); 
         console.log("Current userId:", userId);
         try {
-            const response = await fetch('/api/selected-users', {
+            const response = await fetch('https://messenger-tu85.onrender.com/api/selected-users', {
                 credentials: 'include'
             });
             const data = await response.json();
