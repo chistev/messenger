@@ -21,14 +21,20 @@
   });
 
   async function fetchLoggedInUserId() {
-    try {
-      const response = await fetch('/api/loggedInUserId');
-      const data = await response.json();
-      loggedInUserId = data.loggedInUserId;
-    } catch (error) {
-      console.error('Error fetching loggedInUserId:', error);
+  try {
+    const response = await fetch('https://messenger-tu85.onrender.com/api/loggedInUserId', {
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch logged in user ID');
     }
+    const data = await response.json();
+    loggedInUserId = data.loggedInUserId;
+  } catch (error) {
+    console.error('Error fetching loggedInUserId:', error);
   }
+}
+
 
   function formatTimestamp(timestamp) {
     if (!timestamp || !(timestamp instanceof Date)) return '';
