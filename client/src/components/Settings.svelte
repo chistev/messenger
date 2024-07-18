@@ -9,12 +9,12 @@
 
     async function handleSignOut() {
         try {
-            const response = await fetch('/api/logout', {
+            const response = await fetch('https://messenger-tu85.onrender.com/api/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                credentials: 'include' // Include credentials such as cookies and authorization headers in the request
+                credentials: 'include'
             });
 
             if (response.ok) {
