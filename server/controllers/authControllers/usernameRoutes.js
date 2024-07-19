@@ -76,13 +76,8 @@ router.post('/select-username', deserializeUser, async (req, res) => {
             }
             
             // Debugging statements
-            console.log('Before assignment, session:', req.session);
-            
-            req.session.passport.user = newUser._id;
+            console.log('Before serialization, session:', req.session);
 
-            // Debugging statements
-            console.log('After assignment, session:', req.session);
-            
             res.json({ success: true });
         });
     } catch (error) {
