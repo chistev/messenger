@@ -9,12 +9,13 @@ const checkNewUser = async (req, res, next) => {
       user: req.user
     });
 
-    if (!req.user || !req.user._id || !req.user._id.googleId) {
+    // Correctly check for req.user.googleId directly
+    if (!req.user || !req.user.googleId) {
       console.log('Unauthorized: No user or user ID found');
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const googleId = req.user._id.googleId;
+    const googleId = req.user.googleId;
     console.log('Checking existing user with Google ID:', googleId);
     const existingUser = await User.findOne({ googleId });
 
