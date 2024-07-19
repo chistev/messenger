@@ -1,3 +1,5 @@
+const User = require('../models/User'); // Import User model
+
 function deserializeUser(req, res, next) {
   try {
     const cookie = req.headers.cookie;
@@ -7,7 +9,7 @@ function deserializeUser(req, res, next) {
 
     const sessionID = cookie.split('connect.sid=')[1].split(';')[0].trim();
 
-    req.sessionStore.get(sessionID, (err, session) => {
+    req.sessionStore.get(sessionID, async (err, session) => {
       if (err || !session) {
         return res.status(500).json({ error: 'Session retrieval failed' });
       }
@@ -16,9 +18,18 @@ function deserializeUser(req, res, next) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      req.user = { _id: session.passport.user }; 
+      // Fetch user from the database and attach to req.user
+      try {
+        const user = await User.findById(session.passport.user);
+        if (!user) {
+          return res.status(401).json({ error: 'User not found' });
+        }
 
-      next();
+        req.user = user; // Attach complete user object
+        next();
+      } catch (dbError) {
+        res.status(500).json({ error: 'Database Error' });
+      }
     });
   } catch (error) {
     res.status(500).json({ error: 'Server Error' });
