@@ -76,7 +76,15 @@ app.use('/api/check-new-user', checkNewUser);
 
 app.get('/api/loggedInUserId', (req, res) => {
   try {
-    const loggedInUserId = req.user._id;
+    // Log the incoming request
+    console.log('Request received at /api/loggedInUserId:', {
+      headers: req.headers,
+      user: req.user,
+      session: req.session
+    });
+
+    // Use optional chaining to safely access the _id property of req.user
+    const loggedInUserId = req.user?._id;
 
     if (!loggedInUserId) {
       console.error('User ID not found.');
