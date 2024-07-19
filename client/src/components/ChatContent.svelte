@@ -35,7 +35,6 @@
   }
 }
 
-
   function formatTimestamp(timestamp) {
     if (!timestamp || !(timestamp instanceof Date)) return '';
     return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

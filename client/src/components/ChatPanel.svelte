@@ -14,32 +14,27 @@
     event.preventDefault();
     if (newMessage.trim()) {
       const message = {
-        _id: generateUniqueId(),  
+        _id: generateUniqueId(),
         content: newMessage,
         type: "sent",
         sender: loggedInUserId,
-        recipient: currentChatUser._id, 
+        recipient: currentChatUser._id,
         timestamp: new Date()
       };
 
-      // Add the message to the local list
       messages = [...messages, message];
 
-      // Send the message to the server via WebSocket
-      console.log("Sending message through WebSocket:", message);
       socket.send(JSON.stringify(message));
 
-      // Save the message to the database
       await saveMessage(message);
 
-      // Clear the input field
-      newMessage = ""; 
+      newMessage = "";
     }
   }
 
   function generateUniqueId() {
-  return '_' + Math.random().toString(36).substring(2, 11);
-}
+    return '_' + Math.random().toString(36).substring(2, 11);
+  }
 
   async function saveMessage(message) {
     try {
@@ -48,13 +43,12 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        credentials: 'include', 
+        credentials: 'include',
         body: JSON.stringify(message)
       });
       if (!response.ok) {
         throw new Error('Failed to send message');
       }
-      console.log("Message sent and saved:", message);
     } catch (error) {
       console.error('Error saving message:', error);
     }
@@ -63,7 +57,7 @@
   async function fetchMessages() {
     try {
       const response = await fetch(`https://messenger-tu85.onrender.com/api/messages/${currentChatUser._id}`, {
-        credentials: 'include' 
+        credentials: 'include'
       });
       if (!response.ok) {
         throw new Error('Failed to fetch messages');
@@ -73,7 +67,6 @@
         ...message,
         timestamp: new Date(message.timestamp)
       }));
-      console.log(`Messages fetched for User ID: ${currentChatUser._id}`, messages);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
@@ -82,14 +75,13 @@
   async function fetchLoggedInUserId() {
     try {
       const response = await fetch('https://messenger-tu85.onrender.com/api/loggedInUserId', {
-        credentials: 'include' 
+        credentials: 'include'
       });
       if (!response.ok) {
         throw new Error('Failed to fetch logged in user ID');
       }
       const data = await response.json();
       loggedInUserId = data.loggedInUserId;
-      console.log("Logged in user ID fetched:", loggedInUserId);
     } catch (error) {
       console.error('Error fetching loggedInUserId:', error);
     }
@@ -99,28 +91,21 @@
     fetchMessages();
     fetchLoggedInUserId();
 
-    console.log("Attempting to connect to WebSocket server...");
     socket = new WebSocket('wss://messenger-tu85.onrender.com');
 
     socket.onopen = () => {
-      console.log("WebSocket connection established");
       socket.send(JSON.stringify({ action: 'identify', userId: loggedInUserId }));
     };
 
     socket.onmessage = (event) => {
-      console.log("Message received from WebSocket:", event.data);
-
       try {
         let receivedMessage = JSON.parse(event.data);
         receivedMessage.timestamp = new Date(receivedMessage.timestamp);
 
         const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
 
-        if (receivedMessage.recipient === loggedInUserId && !isDuplicate) {
+        if (receivedMessage.recipient === loggedInUserId && receivedMessage.sender === currentChatUser._id && !isDuplicate) {
           messages = [...messages, receivedMessage];
-          console.log('Parsed received message:', receivedMessage);
-        } else {
-          console.log('Duplicate message received or not intended for the current user.');
         }
       } catch (error) {
         console.error('Error parsing JSON from WebSocket message:', error);
