@@ -88,6 +88,11 @@ app.use('/api/selected-users', require('./controllers/selectedUsers'));
 app.use('/api/check-new-user', checkNewUser);
 
 app.get('/api/loggedInUserId', (req, res) => {
+  console.log('Received request for loggedInUserId');
+  
+  // Log the request headers
+  console.log('Request headers:', req.headers);
+
   try {
     const loggedInUserId = req.user._id;
 
