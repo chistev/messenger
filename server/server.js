@@ -22,19 +22,29 @@ const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws) => {
+  let userId;
+
   ws.on('message', (message) => {
     try {
       const parsedMessage = JSON.parse(message);
       console.log('Parsed message:', parsedMessage);
+
+      if (parsedMessage.action === 'identify') {
+        userId = parsedMessage.userId;
+        ws.userId = userId; // Attach userId to WebSocket
+      } else {
+        // Broadcast message to the intended recipient(s)
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            if (client.userId === parsedMessage.recipient || client.userId === parsedMessage.sender) {
+              client.send(message);
+            }
+          }
+        });
+      }
     } catch (error) {
       console.error('Error parsing JSON:', error);
     }
-
-    wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
   });
 
   ws.on('close', () => {
@@ -45,6 +55,9 @@ wss.on('connection', (ws) => {
     console.error('WebSocket error:', error);
   });
 });
+
+
+
 
 app.use(cors({
   origin: 'https://svelte-of1p.onrender.com',
