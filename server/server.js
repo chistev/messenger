@@ -79,11 +79,11 @@ app.use('/api/check-new-user', checkNewUser);
 
 
 // Serve static files from the 'client/public' folder (where Svelte outputs files)
-app.use(express.static(path.join(__dirname, '../client/static')));
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Serve the Svelte application
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/src'));
+  res.sendFile(path.join(__dirname, '../client/dist/app.html'));
 });
 
 app.get('/api/users/:userid', async (req, res) => {
