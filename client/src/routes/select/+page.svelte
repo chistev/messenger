@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { getJwtToken, setJwtToken } from '../../utils/utils';
+    import { getJwtToken } from '../../utils/utils';
 
     let username = '';
     let errorMessage = '';

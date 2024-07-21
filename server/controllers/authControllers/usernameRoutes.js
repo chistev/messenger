@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../models/User');
 const verifyToken = require('../../middleware/jwtAuthMiddleware');
+const jwt = require('jsonwebtoken');
 
 router.get('/check-username', async (req, res) => {
     const { username } = req.query;
