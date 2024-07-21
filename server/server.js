@@ -8,7 +8,7 @@ const passport = require('passport');
 const selectUser = require('./controllers/selectUser');
 const checkNewUser = require('./middleware/checkNewUser'); 
 const cors = require('cors');
-const deserializeUser = require('./middleware/deserializeUser');
+const verifyToken = require('./middleware/jwtAuthMiddleware');
 
 dotenv.config();
 
@@ -56,9 +56,6 @@ wss.on('connection', (ws) => {
   });
 });
 
-
-
-
 app.use(cors({
   origin: 'https://svelte-of1p.onrender.com',
   credentials: true
@@ -77,7 +74,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api', deserializeUser);
+app.use('/api', verifyToken);
 
 app.use('/', require('./controllers/authControllers/authRoutes'));
 app.use('/', require('./controllers/authControllers/usernameRoutes'));
