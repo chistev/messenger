@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import { getJwtToken } from '../../utils/utils';
 
     let username = '';
     let csrfToken = ''; 
@@ -11,9 +12,14 @@
     const checkUserStatus = async () => {
     try {
         console.log('checkUserStatus function called');
+
+        const jwtToken = getJwtToken();
         
         const response = await fetch('https://messenger-tu85.onrender.com/api/check-new-user', {
-            credentials: 'include'
+            credentials: 'include',
+            headers: {
+            'Authorization': `Bearer ${jwtToken}`
+      }
         });
 
         console.log('Response status:', response.status);
