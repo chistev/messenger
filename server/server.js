@@ -6,9 +6,10 @@ const { createServer } = require('http');
 const dotenv = require('dotenv');
 const passport = require('passport');
 const selectUser = require('./controllers/selectUser');
-const checkNewUser = require('./middleware/checkNewUser'); 
+const checkNewUser = require('./middleware/checkNewUser');
 const cors = require('cors');
 const verifyToken = require('./middleware/jwtAuthMiddleware');
+const cookieParser = require('cookie-parser');
 
 dotenv.config();
 
@@ -63,17 +64,18 @@ app.use(cors({
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(require('./middleware/session')(passport));
+app.use(cookieParser());
 
+// Initialize Passport
 app.use(passport.initialize());
-app.use(passport.session());
 
-// middleware to make WebSocket server accessible in routes
+// Middleware to make WebSocket server accessible in routes
 app.use((req, res, next) => {
   req.wss = wss;
   next();
 });
 
+// Use JWT verification middleware for API routes
 app.use('/api', verifyToken);
 
 app.use('/', require('./controllers/authControllers/authRoutes'));
@@ -108,25 +110,10 @@ app.get('/api/loggedInUserId', (req, res) => {
 });
 
 app.post('/api/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      return res.status(500).json({ message: 'Logout failed' });
-    }
-    res.clearCookie('connect.sid');
-    return res.status(200).json({ message: 'Logged out successfully' });
-  });
+  // Clear JWT cookie on logout
+  res.clearCookie('jwt');
+  res.status(200).json({ message: 'Logged out successfully' });
 });
-
-app.get('/api/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      return res.status(500).json({ message: 'Logout failed' });
-    }
-    res.clearCookie('connect.sid');
-    return res.status(200).json({ message: 'Logged out successfully' });
-  });
-});
-
 
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
