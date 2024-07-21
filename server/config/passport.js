@@ -53,7 +53,7 @@ function initializePassport(passport) {
           email: profile.emails[0].value,
         };
 
-        const token = jwt.sign({ googleId: tempUser.googleId }, process.env.SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ googleId: tempUser.googleId, email: tempUser.email }, process.env.SECRET, { expiresIn: '1d' });
         console.log('Google Strategy - Token generated for temporary user:', token);
         done(null, { tempUser, token });
       }

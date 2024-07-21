@@ -1,56 +1,55 @@
 <script>
     import { onMount } from 'svelte';
-    import { getJwtToken } from '../../utils/utils';
+    import { getJwtToken, setJwtToken } from '../../utils/utils';
 
     let username = '';
-    let csrfToken = ''; 
     let errorMessage = '';
     let successMessage = '';
     let formDisabled = true;
     let userExists = false;
 
     const checkUserStatus = async () => {
-    try {
-        console.log('checkUserStatus function called');
+        try {
+            console.log('checkUserStatus function called');
 
-        const jwtToken = getJwtToken();
-        console.log('Retrieved JWT token:', jwtToken);
-        
-        const response = await fetch('https://messenger-tu85.onrender.com/api/check-new-user', {
-            credentials: 'include',
-            headers: {
-            'Authorization': `Bearer ${jwtToken}`
-      }
-        });
+            const jwtToken = getJwtToken();
+            console.log('Retrieved JWT token:', jwtToken);
 
-        console.log('Response status:', response.status);
+            const response = await fetch('https://messenger-tu85.onrender.com/api/check-new-user', {
+                credentials: 'include',
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`
+                }
+            });
 
-        if (response.status === 401) {
-            console.log('Unauthorized: Redirecting to sign-in page');
-            window.location.href = '/signin';
-            return;
+            console.log('Response status:', response.status);
+
+            if (response.status === 401) {
+                console.log('Unauthorized: Redirecting to sign-in page');
+                window.location.href = '/signin';
+                return;
+            }
+
+            const data = await response.json();
+            console.log('Response data:', data);
+
+            userExists = data.exists;
+
+            if (userExists) {
+                console.log('User exists: Redirecting to messages');
+                window.location.href = '/messages';
+            } else {
+                console.log('User does not exist: Enabling form');
+                errorMessage = '';
+                successMessage = '';
+                formDisabled = false;
+            }
+        } catch (error) {
+            console.error('Error checking user status:', error);
         }
+    };
 
-        const data = await response.json();
-        console.log('Response data:', data);
-        
-        userExists = data.exists;
-
-        if (userExists) {
-            console.log('User exists: Redirecting to messages');
-            window.location.href = '/messages';
-        } else {
-            console.log('User does not exist: Enabling form');
-            errorMessage = '';
-            successMessage = '';
-            formDisabled = false;
-        }
-    } catch (error) {
-        console.error('Error checking user status:', error);
-    }
-};
-
-    onMount(checkUserStatus); 
+    onMount(checkUserStatus);
 
     const checkUsernameAvailability = async (username) => {
         try {
@@ -105,32 +104,38 @@
     };
 
     const handleSubmit = async (event) => {
-    event.preventDefault();
+        event.preventDefault();
 
-    try {
-        const response = await fetch(`https://messenger-tu85.onrender.com/select-username`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username }),
-            credentials: 'include'
-        });
+        try {
+            const jwtToken = getJwtToken();
+            const response = await fetch('https://messenger-tu85.onrender.com/select-username', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`
+                },
+                body: JSON.stringify({ username }),
+                credentials: 'include'
+            });
 
-        const data = await response.json();
-        if (data.error) {
-            errorMessage = data.error;
-            successMessage = '';
-            formDisabled = true;
-        } else {
-            window.location.href = '/messages';
+            const data = await response.json();
+
+            if (data.error) {
+                errorMessage = data.error;
+                successMessage = '';
+                formDisabled = true;
+            } else {
+                // Save the new token in the local storage
+                localStorage.setItem('jwt', data.token);
+                console.log('New token received and stored');
+                window.location.href = '/messages';
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
         }
-    } catch (error) {
-        console.error('Error submitting form:', error);
-    }
-};
-
+    };
 </script>
+
 
 <style>
     body {
@@ -215,7 +220,6 @@
         <h2>What should we call you?</h2>
         <h3 class="mb-4">Your @username is unique. You can't change it later.</h3>
         <form id="username-form" on:submit={handleSubmit}>
-            <input type="hidden" name="_csrf" value={csrfToken}>
             <div class="form-group position-relative mx-auto">
                 <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: white;">@</span>
                 <input type="text" id="username" name="username" bind:value={username} placeholder="Username" on:input={handleInput} required>
