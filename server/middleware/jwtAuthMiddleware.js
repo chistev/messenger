@@ -15,9 +15,7 @@ const verifyToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.SECRET);
     console.log('Token decoded:', decoded);
-    req.user = decoded;
 
-    // Check if the user is a temporary user or fully registered user
     if (decoded.id) {
       // Fully registered user
       console.log('Token belongs to a fully registered user, user ID:', decoded.id);
@@ -25,23 +23,23 @@ const verifyToken = async (req, res, next) => {
       if (user) {
         console.log('User found:', user);
         req.user = user;
-        next();
+        return next();
       } else {
         console.log('User not found in the database');
-        res.status(401).json({ message: 'Unauthorized: User not found' });
+        return res.status(401).json({ message: 'Unauthorized: User not found' });
       }
     } else if (decoded.googleId) {
       // Temporary user
       console.log('Token belongs to a temporary user, Google ID:', decoded.googleId);
       req.tempUser = decoded;
-      next();
+      return next();
     } else {
       console.log('Invalid token');
-      res.status(401).json({ message: 'Unauthorized: Invalid token' });
+      return res.status(401).json({ message: 'Unauthorized: Invalid token' });
     }
   } catch (err) {
     console.error('Error verifying token:', err);
-    res.status(401).json({ message: 'Unauthorized: Invalid token' });
+    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
   }
 };
 
