@@ -22,7 +22,9 @@ router.get('/auth/google/callback',
         maxAge: 24 * 60 * 60 * 1000, // 1 day
         secure: process.env.NODE_ENV === 'production', // True in production
         httpOnly: false, // allow access from JavaScript
-        sameSite: 'None' // Allow cross-site cookies
+        sameSite: 'None', // Allow cross-site cookies
+        domain: 'svelte-of1p.onrender.com', // Client domain
+        path: '/' // Ensure the cookie is accessible from the entire domain
       });
 
       // Redirect based on user status
