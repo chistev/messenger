@@ -21,7 +21,7 @@ router.get('/auth/google/callback',
       res.cookie('jwt', token, {
         maxAge: 24 * 60 * 60 * 1000, // 1 day
         secure: process.env.NODE_ENV === 'production', // True in production
-        httpOnly: true, // Prevent access from JavaScript
+        httpOnly: false, // allow access from JavaScript
         sameSite: 'None' // Allow cross-site cookies
       });
 
