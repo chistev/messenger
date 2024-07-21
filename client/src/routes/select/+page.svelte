@@ -14,6 +14,7 @@
         console.log('checkUserStatus function called');
 
         const jwtToken = getJwtToken();
+        console.log('Retrieved JWT token:', jwtToken);
         
         const response = await fetch('https://messenger-tu85.onrender.com/api/check-new-user', {
             credentials: 'include',
