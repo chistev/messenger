@@ -15,26 +15,10 @@ router.get('/auth/google/callback',
     if (req.user) {
       console.log('User authenticated:', req.user);
       const token = req.user.token;
+      const redirectUrl = req.user.user ? 'https://svelte-of1p.onrender.com/messages' : 'https://svelte-of1p.onrender.com/select';
 
-      // Set a cookie with the token
-      console.log('Setting JWT cookie');
-      res.cookie('jwt', token, {
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
-        secure: process.env.NODE_ENV === 'production', // True in production
-        httpOnly: false, // allow access from JavaScript
-        sameSite: 'None', // Allow cross-site cookies
-        domain: 'svelte-of1p.onrender.com', // Client domain
-        path: '/' // Ensure the cookie is accessible from the entire domain
-      });
-
-      // Redirect based on user status
-      if (req.user.user) {
-        console.log('Fully registered user, redirecting to messages');
-        res.redirect('https://svelte-of1p.onrender.com/messages');
-      } else if (req.user.tempUser) {
-        console.log('Temporary user, redirecting to select page');
-        res.redirect('https://svelte-of1p.onrender.com/select');
-      }
+      // Redirect with token and redirect URL as query parameters
+      res.redirect(`https://svelte-of1p.onrender.com/auth?token=${token}&redirectUrl=${redirectUrl}`);
     } else {
       console.log('User not authenticated, redirecting to sign-in page');
       res.redirect('https://svelte-of1p.onrender.com/signin');
