@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { getJwtToken } from '../utils/utils';
   
   export let users = [];
   
@@ -7,10 +8,12 @@
   
   async function selectUser(selectedUser) {
   try {
+    const jwtToken = getJwtToken();
     const response = await fetch('https://messenger-tu85.onrender.com/api/select-user', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`
       },
       credentials: 'include',
       body: JSON.stringify({
