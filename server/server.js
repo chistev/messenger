@@ -38,7 +38,7 @@ wss.on('connection', (ws) => {
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
             // Ensure that the message is sent only to the intended recipient
-            if (client.userId === parsedMessage.recipient) {
+            if (client.userId === parsedMessage.recipient || client.userId === parsedMessage.sender ) {
               client.send(message);
             }
           }

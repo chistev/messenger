@@ -22,27 +22,29 @@
     };
 
     socket.onmessage = async (event) => {
-
-      if (event.data instanceof Blob) {
-        const reader = new FileReader();
-        reader.onload = function() {
-          try {
-            const data = JSON.parse(reader.result);
-            handleWebSocketMessage(data);
-          } catch (error) {
-            console.error('Error parsing JSON from WebSocket message:', error);
-          }
-        };
-        reader.readAsText(event.data);
-      } else {
-        try {
-          const data = JSON.parse(event.data);
-          handleWebSocketMessage(data);
-        } catch (error) {
-          console.error('Error parsing JSON from WebSocket message:', error);
-        }
+  console.log('Received WebSocket message:', event.data);
+  
+  if (event.data instanceof Blob) {
+    const reader = new FileReader();
+    reader.onload = function() {
+      try {
+        const data = JSON.parse(reader.result);
+        handleWebSocketMessage(data);
+      } catch (error) {
+        console.error('Error parsing JSON from WebSocket message:', error);
       }
     };
+    reader.readAsText(event.data);
+  } else {
+    try {
+      const data = JSON.parse(event.data);
+      handleWebSocketMessage(data);
+    } catch (error) {
+      console.error('Error parsing JSON from WebSocket message:', error);
+    }
+  }
+};
+
 
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -70,8 +72,8 @@
     const response = await fetch('https://messenger-tu85.onrender.com/api/selected-users', {
       credentials: 'include',
       headers: {
-          'Authorization': `Bearer ${jwtToken}`
-        }
+        'Authorization': `Bearer ${jwtToken}`
+      }
     });
     if (!response.ok) {
       throw new Error('Failed to fetch selected users');
@@ -82,6 +84,7 @@
     console.error('Error fetching selected users:', error);
   }
 }
+
 
   function updateSelectedUsersOnMessage(senderId, message) {
     const index = selectedUsers.findIndex(user => user._id === senderId);
