@@ -80,7 +80,6 @@
     } else if (data.content && data.sender) {
       console.log('Message received from sender:', data.sender, 'Content:', data.content);
       updateSelectedUsersOnMessage(data.sender, data.content);
-      fetchSelectedUsers();
     } else {
       console.warn("Unknown message received from WebSocket:", data);
     }
@@ -119,9 +118,6 @@
     }
   }
 </script>
-
-
-
 
 <style>
   #selected-users {
