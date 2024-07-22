@@ -87,11 +87,6 @@ app.use('/api/selected-users', require('./controllers/selectedUsers'));
 app.use('/api/check-new-user', checkNewUser);
 
 app.get('/api/loggedInUserId', (req, res) => {
-  console.log('Received request for loggedInUserId');
-  
-  // Log the request headers
-  console.log('Request headers:', req.headers);
-
   try {
     const loggedInUserId = req.user._id;
 
@@ -99,9 +94,6 @@ app.get('/api/loggedInUserId', (req, res) => {
       console.error('User ID not found.');
       throw new Error('User ID not found');
     }
-
-    console.log('Logged in user ID:', loggedInUserId);
-
     res.json({ loggedInUserId });
   } catch (error) {
     console.error('Error fetching logged in user ID:', error);
@@ -110,7 +102,6 @@ app.get('/api/loggedInUserId', (req, res) => {
 });
 
 app.post('/api/logout', (req, res) => {
-  // Clear JWT cookie on logout
   res.clearCookie('jwt');
   res.status(200).json({ message: 'Logged out successfully' });
 });

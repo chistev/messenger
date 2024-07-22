@@ -1,5 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
+    import { getJwtToken } from '../utils/utils';
 
     const dispatch = createEventDispatcher();
 
@@ -9,10 +10,12 @@
 
     async function handleSignOut() {
         try {
+            const jwtToken = getJwtToken();
             const response = await fetch('https://messenger-tu85.onrender.com/api/logout', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`
                 },
                 credentials: 'include'
             });
@@ -27,6 +30,7 @@
         }
     }
 </script>
+
 
 <style>
     .border-right {
