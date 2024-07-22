@@ -34,15 +34,15 @@ wss.on('connection', (ws) => {
         userId = parsedMessage.userId;
         ws.userId = userId; // Attach userId to WebSocket
       } else {
-        // Broadcast message to the intended recipient(s)
+        // Broadcast message to the intended recipient
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
+            // Ensure that the message is sent only to the intended recipient
             if (client.userId === parsedMessage.recipient) {
               client.send(message);
             }
           }
         });
-        
       }
     } catch (error) {
       console.error('Error parsing JSON:', error);
@@ -57,6 +57,7 @@ wss.on('connection', (ws) => {
     console.error('WebSocket error:', error);
   });
 });
+
 
 app.use(cors({
   origin: 'https://svelte-of1p.onrender.com',

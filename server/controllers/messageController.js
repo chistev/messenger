@@ -18,10 +18,11 @@ router.post('/:userId', async (req, res) => {
     const savedMessage = await message.save();
 
     req.wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
+      if (client.readyState === WebSocket.OPEN &&
+          (client.userId === message.recipient || client.userId === message.sender)) {
         client.send(JSON.stringify(savedMessage));
       }
-    });
+    }); 
 
     res.status(200).json(savedMessage);
   } catch (err) {
@@ -34,8 +35,9 @@ router.get('/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const messages = await Message.find({ $or: [{ sender: userId }, { recipient: userId }] })
-                                  .sort({ timestamp: 1 });
+    const messages = await Message.find({
+      $or: [{ sender: req.user._id, recipient: userId }, { sender: userId, recipient: req.user._id }]
+    }).sort({ timestamp: 1 });
     res.status(200).json({ messages });
   } catch (err) {
     console.error('Error fetching messages:', err);

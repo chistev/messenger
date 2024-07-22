@@ -109,19 +109,22 @@
     };
 
     socket.onmessage = (event) => {
-      try {
-        let receivedMessage = JSON.parse(event.data);
-        receivedMessage.timestamp = new Date(receivedMessage.timestamp);
+  try {
+    let receivedMessage = JSON.parse(event.data);
+    receivedMessage.timestamp = new Date(receivedMessage.timestamp);
 
-        const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
+    const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
 
-        if (receivedMessage.recipient === loggedInUserId && receivedMessage.sender === currentChatUser._id && !isDuplicate) {
-          messages = [...messages, receivedMessage];
-        }
-      } catch (error) {
-        console.error('Error parsing JSON from WebSocket message:', error);
-      }
-    };
+    if (!isDuplicate &&
+        ((receivedMessage.recipient === loggedInUserId && receivedMessage.sender === currentChatUser._id) ||
+         (receivedMessage.sender === loggedInUserId && receivedMessage.recipient === currentChatUser._id))) {
+      messages = [...messages, receivedMessage];
+    }
+  } catch (error) {
+    console.error('Error parsing JSON from WebSocket message:', error);
+  }
+};
+
 
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
