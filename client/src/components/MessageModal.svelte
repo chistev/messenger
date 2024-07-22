@@ -3,6 +3,7 @@
   import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import RetrievedUsers from './RetrievedUsers.svelte';
+  import { getJwtToken } from '../utils/utils';
 
   const dispatch = createEventDispatcher();
   let inputRef;
@@ -32,7 +33,11 @@
 
   async function fetchUsers(query) {
   try {
+    const jwtToken = getJwtToken();
     const response = await fetch(`https://messenger-tu85.onrender.com/api/users?username=${query}`, {
+      headers: {
+          'Authorization': `Bearer ${jwtToken}`
+        },
       credentials: 'include'
     });
     if (!response.ok) {
@@ -44,7 +49,6 @@
     console.error('Error fetching users:', error);
   }
 }
-
 
   function handleInput(event) {
     const query = event.target.value;
