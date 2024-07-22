@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
       _id: { $nin: selectedUserIds.concat(currentUser._id) }
     }).limit(10);
 
-    res.json(users);
+    res.json(users); 
   } catch (error) {
     console.error('Error occurred:', error);
     res.status(500).send('Server Error');

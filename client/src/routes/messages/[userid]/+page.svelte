@@ -15,64 +15,90 @@
 
     function toggleSettings() {
         showSettings = !showSettings;
+        console.log("Settings toggled. Show settings:", showSettings);
     }
 
     function toggleMessageModal() {
         showMessageModal = !showMessageModal;
         document.querySelector('.page-container').style.backgroundColor = showMessageModal ? '#242d34' : '#000000';
+        console.log("Message modal toggled. Show message modal:", showMessageModal);
     }
 
     function closeMessageModal() {
         showMessageModal = false;
         document.querySelector('.page-container').style.backgroundColor = '#000000';
+        console.log("Message modal closed.");
     }
 
     function handleUserSelection(event) {
         currentChatUser = event.detail;
         history.pushState(null, '', `/messages/${currentChatUser._id}`);
+        console.log("User selected:", currentChatUser);
     }
 
     async function fetchUserById(userId) {
+        console.log("Fetching user by ID:", userId);
         const jwtToken = getJwtToken();
-        const response = await fetch(`https://messenger-tu85.onrender.com/api/users/${userId}`, {
-            headers: {
+        try {
+            const response = await fetch(`https://messenger-tu85.onrender.com/api/users/${userId}`, {
+                headers: {
                     'Authorization': `Bearer ${jwtToken}`
                 },
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            throw new Error('Failed to fetch user');
+                credentials: 'include'
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text(); // Get error text
+                console.error(`Failed to fetch user: ${response.status} ${response.statusText} - ${errorText}`);
+                throw new Error(`Failed to fetch user: ${response.status} ${response.statusText}`);
+            }
+
+            const user = await response.json();
+            console.log("User fetched:", user);
+            return user;
+        } catch (err) {
+            console.error('Error fetching user:', err);
+            throw err; // Re-throw error to handle in onMount
         }
-        const user = await response.json();
-        console.log("User fetched", user);
-        return user;
     }
 
     onMount(async () => {
         const userId = window.location.pathname.split('/').pop(); 
+        console.log("Page mounted. User ID from URL:", userId);
+
         try {
             const jwtToken = getJwtToken();
+            console.log("Fetching selected users. JWT Token:", jwtToken);
             const response = await fetch('https://messenger-tu85.onrender.com/api/selected-users', {
                 headers: {
                     'Authorization': `Bearer ${jwtToken}`
                 },
                 credentials: 'include'
             });
+
+            if (!response.ok) {
+                const errorText = await response.text(); // Get error text
+                console.error(`Failed to fetch selected users: ${response.status} ${response.statusText} - ${errorText}`);
+                throw new Error(`Failed to fetch selected users: ${response.status} ${response.statusText}`);
+            }
+
             const data = await response.json();
             selectedUsers = data.selectedUsers;
-            console.log("Selected users fetched", selectedUsers); 
+            console.log("Selected users fetched:", selectedUsers); 
 
             if (userId) {
                 currentChatUser = await fetchUserById(userId);
-                console.log("currentChatUser set", currentChatUser); 
+                console.log("Current chat user set:", currentChatUser); 
             }
         } catch (err) {
-            console.error('Failed to fetch selected users:', err);
+            console.error('Error during onMount:', err);
         } finally {
             loading = false;
+            console.log("Loading finished. Current chat user:", currentChatUser);
         }
     });
 </script>
+
 
 <style>
     .border-right {
