@@ -21,6 +21,8 @@
             });
 
             if (response.ok) {
+                localStorage.removeItem('jwt');
+                // Redirect to sign-in page
                 window.location.href = '/signin';
             } else {
                 console.error('Failed to log out');
@@ -30,6 +32,7 @@
         }
     }
 </script>
+
 
 
 <style>

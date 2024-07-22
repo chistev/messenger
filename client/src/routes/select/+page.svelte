@@ -10,10 +10,7 @@
 
     const checkUserStatus = async () => {
         try {
-            console.log('checkUserStatus function called');
-
             const jwtToken = getJwtToken();
-            console.log('Retrieved JWT token:', jwtToken);
 
             const response = await fetch('https://messenger-tu85.onrender.com/api/check-new-user', {
                 credentials: 'include',
@@ -22,8 +19,6 @@
                 }
             });
 
-            console.log('Response status:', response.status);
-
             if (response.status === 401) {
                 console.log('Unauthorized: Redirecting to sign-in page');
                 window.location.href = '/signin';
@@ -31,12 +26,10 @@
             }
 
             const data = await response.json();
-            console.log('Response data:', data);
 
             userExists = data.exists;
 
             if (userExists) {
-                console.log('User exists: Redirecting to messages');
                 window.location.href = '/messages';
             } else {
                 console.log('User does not exist: Enabling form');
@@ -127,7 +120,6 @@
             } else {
                 // Save the new token in the local storage
                 localStorage.setItem('jwt', data.token);
-                console.log('New token received and stored');
                 window.location.href = '/messages';
             }
         } catch (error) {
