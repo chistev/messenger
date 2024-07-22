@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte';
   import UserList from './UserList.svelte';
+  import { getJwtToken } from '../utils/utils';
 
   export let selectedUsers = [];
   const dispatch = createEventDispatcher();
@@ -65,8 +66,12 @@
 
   async function fetchSelectedUsers() {
   try {
+    const jwtToken = getJwtToken();
     const response = await fetch('https://messenger-tu85.onrender.com/api/selected-users', {
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+          'Authorization': `Bearer ${jwtToken}`
+        }
     });
     if (!response.ok) {
       throw new Error('Failed to fetch selected users');

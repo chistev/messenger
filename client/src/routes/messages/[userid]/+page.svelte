@@ -5,6 +5,7 @@
     import MessageModal from '../../../components/MessageModal.svelte';
     import SelectedUsersList from '../../../components/SelectedUsersList.svelte';
     import Settings from '../../../components/Settings.svelte';
+    import { getJwtToken } from '../../../utils/utils';
 
     let showSettings = false;
     let showMessageModal = false;
@@ -32,8 +33,11 @@
     }
 
     async function fetchUserById(userId) {
-        console.log("fetchUserById called with userId", userId);
+        const jwtToken = getJwtToken();
         const response = await fetch(`https://messenger-tu85.onrender.com/api/users/${userId}`, {
+            headers: {
+                    'Authorization': `Bearer ${jwtToken}`
+                },
             credentials: 'include'
         });
         if (!response.ok) {
@@ -46,9 +50,12 @@
 
     onMount(async () => {
         const userId = window.location.pathname.split('/').pop(); 
-        console.log("Current userId:", userId);
         try {
+            const jwtToken = getJwtToken();
             const response = await fetch('https://messenger-tu85.onrender.com/api/selected-users', {
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`
+                },
                 credentials: 'include'
             });
             const data = await response.json();
