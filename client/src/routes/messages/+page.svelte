@@ -7,6 +7,7 @@
     import ChatPanel from '../../components/ChatPanel.svelte';
     import SelectMessage from '../../components/SelectMessage.svelte';
     import { onMount } from 'svelte';
+    import { getJwtToken } from '../../utils/utils';
 
     let showSettings = false;
     let showMessageModal = false;
@@ -43,9 +44,13 @@
 
     onMount(async () => {
         try {
+            const jwtToken = getJwtToken();
             console.log('Fetching logged in user ID');
             const authResponse = await fetch('https://messenger-tu85.onrender.com/api/loggedInUserId', {
-                credentials: 'include'
+                credentials: 'include',
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`
+                }
             });
 
             console.log('Auth Response:', authResponse);
@@ -54,7 +59,10 @@
                 return;
             }
             const response = await fetch('https://messenger-tu85.onrender.com/api/selected-users', {
-                credentials: 'include'
+                credentials: 'include',
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`
+                }
             });
             const data = await response.json();
             selectedUsers = data.selectedUsers;
