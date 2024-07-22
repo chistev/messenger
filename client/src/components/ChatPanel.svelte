@@ -24,11 +24,9 @@
       };
 
       messages = [...messages, message];
-
       socket.send(JSON.stringify(message));
 
       await saveMessage(message);
-
       newMessage = "";
     }
   }
@@ -93,38 +91,37 @@
       }
       const data = await response.json();
       loggedInUserId = data.loggedInUserId;
+
+      initializeWebSocket();
     } catch (error) {
       console.error('Error fetching loggedInUserId:', error);
     }
   }
 
-  onMount(() => {
-    fetchMessages();
-    fetchLoggedInUserId();
-
+  function initializeWebSocket() {
     socket = new WebSocket('wss://messenger-tu85.onrender.com');
 
     socket.onopen = () => {
+      console.log("WebSocket connection established.");
       socket.send(JSON.stringify({ action: 'identify', userId: loggedInUserId }));
     };
 
     socket.onmessage = (event) => {
-  try {
-    let receivedMessage = JSON.parse(event.data);
-    receivedMessage.timestamp = new Date(receivedMessage.timestamp);
+      try {
+        let receivedMessage = JSON.parse(event.data);
+        receivedMessage.timestamp = new Date(receivedMessage.timestamp);
 
-    const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
+        const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
 
-    if (!isDuplicate &&
-        ((receivedMessage.recipient === loggedInUserId && receivedMessage.sender === currentChatUser._id) ||
-         (receivedMessage.sender === loggedInUserId && receivedMessage.recipient === currentChatUser._id))) {
-      messages = [...messages, receivedMessage];
-    }
-  } catch (error) {
-    console.error('Error parsing JSON from WebSocket message:', error);
-  }
-};
-
+        if (!isDuplicate &&
+            ((receivedMessage.recipient === loggedInUserId && receivedMessage.sender === currentChatUser._id) ||
+             (receivedMessage.sender === loggedInUserId && receivedMessage.recipient === currentChatUser._id))) {
+          messages = [...messages, receivedMessage];
+        }
+      } catch (error) {
+        console.error('Error parsing JSON from WebSocket message:', error);
+      }
+    };
 
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -133,6 +130,11 @@
     socket.onclose = (event) => {
       console.log("WebSocket connection closed:", event);
     };
+  }
+
+  onMount(() => {
+    fetchLoggedInUserId();
+    fetchMessages();
   });
 
   beforeUpdate(() => {
