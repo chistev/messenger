@@ -100,15 +100,17 @@
 
   function initializeWebSocket() {
     socket = new WebSocket('wss://messenger-tu85.onrender.com');
+    socket.binaryType = 'blob'; // Ensure binaryType is 'blob'
 
     socket.onopen = () => {
       console.log("WebSocket connection established.");
       socket.send(JSON.stringify({ action: 'identify', userId: loggedInUserId }));
     };
 
-    socket.onmessage = (event) => {
+    socket.onmessage = async (event) => {
       try {
-        let receivedMessage = JSON.parse(event.data);
+        const text = await event.data.text(); // Convert Blob to text
+        let receivedMessage = JSON.parse(text);
         receivedMessage.timestamp = new Date(receivedMessage.timestamp);
 
         const isDuplicate = messages.some(msg => msg._id === receivedMessage._id);
@@ -145,6 +147,7 @@
     }
   });
 </script>
+
 
 <style>
   .border-right {
