@@ -37,11 +37,12 @@ wss.on('connection', (ws) => {
         // Broadcast message to the intended recipient(s)
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-            if (client.userId === parsedMessage.recipient || client.userId === parsedMessage.sender) {
+            if (client.userId === parsedMessage.recipient) {
               client.send(message);
             }
           }
         });
+        
       }
     } catch (error) {
       console.error('Error parsing JSON:', error);
