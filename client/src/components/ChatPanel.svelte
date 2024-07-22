@@ -1,6 +1,7 @@
 <script>
   import { onMount, beforeUpdate } from "svelte";
   import ChatContent from "./ChatContent.svelte";
+  import { getJwtToken } from '../utils/utils';
 
   export let currentChatUser;
 
@@ -38,10 +39,12 @@
 
   async function saveMessage(message) {
     try {
+      const jwtToken = getJwtToken();
       const response = await fetch(`https://messenger-tu85.onrender.com/api/messages/${currentChatUser._id}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtToken}`
         },
         credentials: 'include',
         body: JSON.stringify(message)
@@ -56,7 +59,11 @@
 
   async function fetchMessages() {
     try {
+      const jwtToken = getJwtToken();
       const response = await fetch(`https://messenger-tu85.onrender.com/api/messages/${currentChatUser._id}`, {
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`
+        },
         credentials: 'include'
       });
       if (!response.ok) {
@@ -74,7 +81,11 @@
 
   async function fetchLoggedInUserId() {
     try {
+      const jwtToken = getJwtToken();
       const response = await fetch('https://messenger-tu85.onrender.com/api/loggedInUserId', {
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`
+        },
         credentials: 'include'
       });
       if (!response.ok) {

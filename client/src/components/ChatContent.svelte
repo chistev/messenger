@@ -1,5 +1,6 @@
 <script>
   import { onMount, afterUpdate } from 'svelte';
+  import { getJwtToken } from '../utils/utils';
 
   export let messages = [];
   let messageContainer;
@@ -22,8 +23,12 @@
 
   async function fetchLoggedInUserId() {
   try {
+    const jwtToken = getJwtToken();
     const response = await fetch('https://messenger-tu85.onrender.com/api/loggedInUserId', {
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+          'Authorization': `Bearer ${jwtToken}`
+        }
     });
     if (!response.ok) {
       throw new Error('Failed to fetch logged in user ID');
